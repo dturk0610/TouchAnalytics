@@ -3,11 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/Shawn Boyd/Documents/ClarksonFall2021/TouchAnalytics/app/src/main/res/drawable/round_button.xml" value="0.290625" />
+        <entry key="app/src/main/res/drawable/round_button.xml" value="0.2552083333333333" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="11" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

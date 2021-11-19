@@ -1,6 +1,7 @@
 package com.example.touchanalytics;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import java.util.List;
@@ -9,7 +10,7 @@ public class AnalyticDataManager {
     /*
     [userId,eventTime,action,phoneOrientation,xCoord,yCoord,pressure,size]
     */
-    public class AnalyticDataEntry implements java.io.Serializable {
+    public static class AnalyticDataEntry implements java.io.Serializable {
         /*
          * 'phone ID', - won't be used
 
@@ -59,6 +60,17 @@ public class AnalyticDataManager {
         private float pressure;
         private float size; //the area of which the finger takes up on the screen
 
+        public AnalyticDataEntry(long userId, long eventTime, int action, int phoneOrientation, float xCoord, float yCoord, float pressure, float size) {
+            this.userId = userId;
+            this.eventTime = eventTime;
+            this.action = action;
+            this.phoneOrientation = phoneOrientation;
+            this.xCoord = xCoord;
+            this.yCoord = yCoord;
+            this.pressure = pressure;
+            this.size = size;
+        }
+
         public AnalyticDataEntry(long userId, long eventTime, int action, Activity activity, float xCoord, float yCoord, float pressure, float size) {
             this.userId = userId;
             this.eventTime = eventTime;
@@ -95,7 +107,7 @@ public class AnalyticDataManager {
         }
     }
 
-    public class AnalyticDataFeatureSet implements java.io.Serializable{
+    public static class AnalyticDataFeatureSet implements java.io.Serializable{
         /*
         * 20.58%    mid-stroke area covered
         * 19.63%    20%-perc. pairwise velocity
@@ -164,7 +176,8 @@ public class AnalyticDataManager {
                 }
                 userId = swipe[0].userId;
                 int arrSize = swipe.length;
-                float invArrSize = 1/((float)arrSize);
+                float invArrSize = 1f/(arrSize-1);
+
                 midStrokeArea = swipe[arrSize / 2].size;
                 midStrokePressure = swipe[arrSize / 2].pressure;
                 startx = swipe[0].xCoord;
@@ -172,12 +185,10 @@ public class AnalyticDataManager {
                 starty = swipe[0].xCoord;
                 stopy = swipe[arrSize - 1].yCoord;
                 float[] startPos = {startx, starty};
-                float[] stopPos = {startx, starty};
+                float[] stopPos = {stopx, stopy};
 
-                float lastXmFirst = sub(stopPos, startPos)[0];
-                float lastYmFirst = sub(stopPos, startPos)[1];
-                directEtoEDist = (float) Math.sqrt(lastXmFirst * lastXmFirst + lastYmFirst * lastYmFirst);
-                dirEtoELine = new float[]{lastXmFirst / directEtoEDist, lastYmFirst / directEtoEDist};
+                directEtoEDist = mag(sub(stopPos, startPos));
+                dirEtoELine = mult(sub(stopPos, startPos), 1/directEtoEDist);
                 float uDotDirEtoE = dot(dirEtoELine, u), dDotDirEtoE = dot(dirEtoELine, d);
                 float lDotDirEtoE = dot(dirEtoELine, l), rDotDirEtoE = dot(dirEtoELine, r);
                 if ((uDotDirEtoE > dDotDirEtoE) && (uDotDirEtoE > lDotDirEtoE) && (uDotDirEtoE > rDotDirEtoE))
@@ -242,7 +253,30 @@ public class AnalyticDataManager {
                 avgDir = new float[]{0, 0};
                 largestDeviationFromEtoELine = 0;
 
-                for (int i = 1; i < arrSize; i++){
+                float[] pos0 = {swipe[0].xCoord, swipe[0].yCoord};
+                float[] pos1 = {swipe[1].xCoord, swipe[1].yCoord};
+                float[] pos2 = {swipe[2].xCoord, swipe[2].yCoord};
+                float[] pos3 = {swipe[3].xCoord, swipe[3].yCoord};
+                float[] pos4 = {swipe[4].xCoord, swipe[4].yCoord};
+                float[] pos5 = {swipe[5].xCoord, swipe[5].yCoord};
+                double invTimeStep1 = 1/((swipe[1].eventTime - swipe[0].eventTime)*.001);
+                double invTimeStep2 = 1/((swipe[2].eventTime - swipe[1].eventTime)*.001);
+                double invTimeStep3 = 1/((swipe[3].eventTime - swipe[2].eventTime)*.001);
+                double invTimeStep4 = 1/((swipe[4].eventTime - swipe[3].eventTime)*.001);
+
+
+                float acceel1 = mag(sub(pos1, pos2));
+
+                //                                  -2 to get us to actually last point since the
+                //                                  last and second to last are the same, -[0-3] for
+                //                                  obvious reasons
+                float[] posLast         =   {swipe[arrSize - 2 - 0].xCoord, swipe[arrSize - 2 - 0].yCoord};
+                float[] posSecondToLast =   {swipe[arrSize - 2 - 1].xCoord, swipe[arrSize - 2 - 1].yCoord};
+                float[] posThirdToLast  =   {swipe[arrSize - 2 - 2].xCoord, swipe[arrSize - 2 - 2].yCoord};
+                float[] posFourthToLast =   {swipe[arrSize - 2 - 3].xCoord, swipe[arrSize - 2 - 3].yCoord};
+
+
+                for (int i = 1; i < arrSize - 1; i++){
                     AnalyticDataEntry currData = swipe[i];
                     AnalyticDataEntry prevData = swipe[i-1];
 
@@ -250,13 +284,13 @@ public class AnalyticDataManager {
                     float[] lastPos = new float[]{prevData.xCoord, prevData.yCoord};
                     float[] displacement = sub(currPos, lastPos);
                     float magDisp = mag(displacement);
-                    float[] currDir = mult(displacement, 1/magDisp);
+                    float[] currDir = mult(displacement, 1f/magDisp);
                     lengthOfTrajectory +=magDisp;
-                    avgDir = add(avgDir, mult(currDir, invArrSize));
+                    avgDir = add(avgDir, currDir);
 
                     long currTime = currData.eventTime;
                     long lastTime = prevData.eventTime;
-                    double invTimeStep = 1/((lastTime - currTime)*.001);
+                    double invTimeStep = 1/((currTime - lastTime)*.001);
 
                     float currVel = (float)(magDisp*invTimeStep);
                     avgVel += currVel*invArrSize;
@@ -267,6 +301,7 @@ public class AnalyticDataManager {
                     if (currDeviation > largestDeviationFromEtoELine)
                         largestDeviationFromEtoELine = currDeviation;
                 }
+                avgDir = mult(avgDir, 1/mag(avgDir));
 
                 ratiodirectEtoEDistandlengthOfTrajectory = directEtoEDist/lengthOfTrajectory;
 
@@ -276,7 +311,83 @@ public class AnalyticDataManager {
             }
         }
 
+        public String toDebugString(){
+            String res = "";
+            res += "userId: " + Long.toString(userId) + "\n";
+            res += "midStrokeArea: " + Float.toString(midStrokeArea) + "\n";
+            res += "midStrokePressure: " + Float.toString(midStrokePressure) + "\n";
+            res += "avgVel: " + Float.toString(avgVel) + "\n";
+            res += "directEtoEDist: " + Float.toString(directEtoEDist) + "\n";
+            res += "lengthOfTrajectory: " + Float.toString(lengthOfTrajectory) + "\n";
+            res += "ratiodirectEtoEDistandlengthOfTrajectory: " + Float.toString(ratiodirectEtoEDistandlengthOfTrajectory) + "\n";
+            res += "largestDeviationFromEtoELine: " + Float.toString(largestDeviationFromEtoELine) + "\n";
+            res += "meanResultantLength: " + Float.toString(meanResultantLength) + "\n";
+            res += "medianVelocityAtLast3pts: " + Float.toString(medianVelocityAtLast3pts) + "\n";
+            res += "medianAccelAtFirst5Points: " + Float.toString(medianAccelAtFirst5Points) + "\n";
+            res += "vel20per: " + Float.toString(vel20per) + "\n";
+            res += "vel50per: " + Float.toString(vel50per) + "\n";
+            res += "vel80per: " + Float.toString(vel80per) + "\n";
+            res += "accel20per: " + Float.toString(accel20per) + "\n";
+            res += "accel50per: " + Float.toString(accel50per) + "\n";
+            res += "accel80per: " + Float.toString(accel80per) + "\n";
+            res += "deviation20PercFromEtoELine: " + Float.toString(deviation20PercFromEtoELine) + "\n";
+            res += "deviation50PercFromEtoELine: " + Float.toString(deviation50PercFromEtoELine) + "\n";
+            res += "deviation80PercFromEtoELine: " + Float.toString(deviation80PercFromEtoELine) + "\n";
 
+            res+= "dirEtoELine: [" + Float.toString(dirEtoELine[0]) + ", " + Float.toString(dirEtoELine[1]) + "]\n";
+            res+= "avgDir: [" + Float.toString(avgDir[0]) + ", " + Float.toString(avgDir[1]) + "]\n";
+
+            res += "startx: " + Float.toString(startx) + "\n";
+            res += "stopx: " + Float.toString(stopx) + "\n";
+            res += "starty: " + Float.toString(starty) + "\n";
+            res += "stopy: " + Float.toString(stopy) + "\n";
+
+            res+= "strokeDuration: " + Long.toString(strokeDuration) + "\n";
+
+            res += "phoneOrientation: " + Integer.toString(phoneOrientation) + "\n";
+            res += "udlrFlag: " + Integer.toString(udlrFlag);
+
+            return res;
+        }
+
+        public String toString(){
+            String res = "";
+            res += Long.toString(userId) +',';
+            res += Float.toString(midStrokeArea) +',';
+            res += Float.toString(midStrokePressure) +',';
+            res += Float.toString(avgVel) +',';
+            res += Float.toString(directEtoEDist) +',';
+            res += Float.toString(lengthOfTrajectory) +',';
+            res += Float.toString(ratiodirectEtoEDistandlengthOfTrajectory) +',';
+            res += Float.toString(largestDeviationFromEtoELine) +',';
+            res += Float.toString(meanResultantLength) +',';
+            res += Float.toString(medianVelocityAtLast3pts) +',';
+            res += Float.toString(medianAccelAtFirst5Points) +',';
+            res += Float.toString(vel20per) +',';
+            res += Float.toString(vel50per) +',';
+            res += Float.toString(vel80per) +',';
+            res += Float.toString(accel20per) +',';
+            res += Float.toString(accel50per) +',';
+            res += Float.toString(accel80per) +',';
+            res += Float.toString(deviation20PercFromEtoELine) +',';
+            res += Float.toString(deviation50PercFromEtoELine) +',';
+            res += Float.toString(deviation80PercFromEtoELine) +',';
+
+            res += Float.toString(dirEtoELine[0]) + " " + Float.toString(dirEtoELine[1]) + ',';
+            res += Float.toString(avgDir[0]) + " " + Float.toString(avgDir[1]) + ',';
+
+            res += Float.toString(startx) +',';
+            res += Float.toString(stopx) +',';
+            res += Float.toString(starty) +',';
+            res += Float.toString(stopy) +',';
+
+            res += Long.toString(strokeDuration) +',';
+
+            res += Integer.toString(phoneOrientation) +',';
+            res += Integer.toString(udlrFlag);
+
+            return res;
+        }
 
         private float dot(float[] a, float[] b){ return a[0]*b[0] + a[1]*b[1]; }
         private float[] add(float[] a, float[] b){ return new float[]{a[0] + b[0], a[1] + b[1]}; }
@@ -290,15 +401,15 @@ public class AnalyticDataManager {
     //ideally this will be the entirety of one user's calibration test
     public boolean AddEntries(List<AnalyticDataEntry> usersEntries){
         long currUserID = usersEntries.get(0).userId;
+
+        //Makes sure that all entries being added are from the same user
         for (AnalyticDataEntry dataEntry : usersEntries){
             if (dataEntry.userId != currUserID){
                 return false;
             }
         }
         for (AnalyticDataEntry dataEntry : usersEntries){
-            if (dataEntry.userId != currUserID){
-                return false;
-            }
+            AllPointsOfData.add(dataEntry);
         }
         return true;
     }

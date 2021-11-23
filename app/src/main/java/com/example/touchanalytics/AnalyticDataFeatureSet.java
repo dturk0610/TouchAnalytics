@@ -1,5 +1,7 @@
 package com.example.touchanalytics;
 
+import android.util.Log;
+
 import com.example.touchanalytics.AnalyticDataEntry;
 
 public class AnalyticDataFeatureSet implements java.io.Serializable{
@@ -238,7 +240,11 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
                 float[] lastPos = new float[]{prevData.xCoord, prevData.yCoord};
                 float[] displacement = subVec(currPos, lastPos);
                 float magDisp = magVec(displacement);
-                float[] currDir = scaleVec(displacement, 1f/magDisp);
+                float[] currDir;
+                if (magDisp != 0)
+                    currDir = scaleVec(displacement, 1f/magDisp);
+                else
+                    currDir = new float[] {0, 0};
                 lengthOfTrajectory +=magDisp;
                 avgDir = addVec(avgDir, currDir);
 
@@ -256,7 +262,6 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
                     largestDeviationFromEtoELine = currDeviation;
             }
             avgDir = scaleVec(avgDir, 1/magVec(avgDir));
-
             ratiodirectEtoEDistandlengthOfTrajectory = directEtoEDist/lengthOfTrajectory;
 
         }
@@ -402,7 +407,7 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
                 vel50per *scaler, vel80per *scaler, accel20per *scaler, accel50per *scaler,
                 accel80per *scaler, deviation20PercFromEtoELine *scaler,
                 deviation50PercFromEtoELine *scaler, deviation80PercFromEtoELine *scaler,
-                scaleVec(dirEtoELine, scaler), scaleVec(avgDir, scaler), startx *scaler,
+                scaleVec(dirEtoELine, 1/magVec(dirEtoELine)), scaleVec(avgDir, 1/magVec(avgDir)), startx *scaler,
                 stopx *scaler, starty *scaler, stopy *scaler, (int)(strokeDuration*scaler),
                 (int)(phoneOrientation*scaler), (int)(udlrFlag*scaler));
         return newFeatureSet;

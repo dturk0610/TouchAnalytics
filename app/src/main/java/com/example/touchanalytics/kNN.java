@@ -1,5 +1,7 @@
 package com.example.touchanalytics;
 
+import android.util.Log;
+
 public class kNN {
 
     static float mSAWeight = .2058f;
@@ -70,12 +72,11 @@ public class kNN {
         distance += set2mset1.strokeDuration*set2mset1.strokeDuration;
         distance += set2mset1.phoneOrientation*set2mset1.phoneOrientation;
         distance += set2mset1.udlrFlag*set2mset1.udlrFlag;
-
         return (float)Math.sqrt(distance);
     }
 
     public static float weightedDist(AnalyticDataFeatureSet set1, AnalyticDataFeatureSet set2){
-        float distance = 0;
+        double distance = 0;
             /*midStrokeArea,midStrokePressure,avgVel,directEtoEDist,lengthOfTrajectory,
             ratiodirectEtoEDistandlengthOfTrajectory,largestDeviationFromEtoELine,medianVelocityAtLast3pts,
             medianAccelAtFirst5Points,vel20per,vel50per,vel80per,accel20per,accel50per,accel80per,
@@ -88,7 +89,7 @@ public class kNN {
         distance += avgVelWeight*set2mset1.avgVel*set2mset1.avgVel;
         distance += dirEtoEDistWeight*set2mset1.directEtoEDist*set2mset1.directEtoEDist;
         distance += lnTrajWeight*set2mset1.lengthOfTrajectory*set2mset1.lengthOfTrajectory;
-        distance += ratioWeight*set2mset1.ratiodirectEtoEDistandlengthOfTrajectory*set2mset1.ratiodirectEtoEDistandlengthOfTrajectory;
+        distance += ratioWeight*set2mset1.ratiodirectEtoEDistandlengthOfTrajectory;
         distance += largeDevWeight*set2mset1.largestDeviationFromEtoELine*set2mset1.largestDeviationFromEtoELine;
         distance += medVelLast3Weight*set2mset1.medianVelocityAtLast3pts*set2mset1.medianVelocityAtLast3pts;
         distance += medAccelFirst5Weight*set2mset1.medianAccelAtFirst5Points*set2mset1.medianAccelAtFirst5Points;
@@ -112,6 +113,7 @@ public class kNN {
         distance += strokeDurWeight*set2mset1.strokeDuration*set2mset1.strokeDuration;
         distance += phoneOrienWeight*set2mset1.phoneOrientation*set2mset1.phoneOrientation;
         distance += udlrFlagWeight*set2mset1.udlrFlag*set2mset1.udlrFlag;
+
 
         return (float)Math.sqrt(distance);
     }

@@ -1,12 +1,14 @@
 package com.example.touchanalytics;
 
 import android.content.Context;
+import android.renderscript.ScriptGroup;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EventListener;
 import java.util.List;
 
@@ -15,29 +17,28 @@ public class AnalyticDataManager {
     public int[] usersCSVs;
     public ArrayList<AnalyticDataFeatureSet> featuresOfCurrentUser;
     AnalyticDataFeatureSet runningUserAverage;
-    float maxDistanceFromAverage;
+    float maxDistanceFromAverage = Float.MIN_VALUE;
     Thread CSVParserThread;
     private Context context;
 
     private List<AnalyticDataEntry> AllPointsOfData;
 
-    public AnalyticDataManager(Context current, int[] allUserCSVIds){
-        this.context = current;
+    public AnalyticDataManager(Context currentContext, int[] allUserCSVIds){
+        this.context = currentContext;
         usersCSVs = allUserCSVIds;
         selectedUserIndex = 0;
-        CSVParserThread = new Thread();
+        CSVParserThread = new Thread(this::parseCSV);
+        CSVParserThread.run();
     }
 
     public void parseCSV(){
-        Thread thisThread = Thread.currentThread();
-        String currentLine;
         try {
             InputStream inStream = context.getResources().openRawResource(usersCSVs[selectedUserIndex]);
             ArrayList<AnalyticDataEntry> swipe = new ArrayList<AnalyticDataEntry>();
             BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
+            String currentLine;
             int trueSwipeCount = 0;
-            while (CSVParserThread == thisThread && (currentLine = br.readLine()) != null) {
-
+            while ((currentLine = br.readLine()) != null) {
                 //From CSV:
                 //{0}'phone ID',{1}'user ID',{2}'document ID',{3}'time[ms]',{4}'action'
                 //{5}'phone orientation',{6}'x-coordinate',{7}'y-coordinate',{8}'pressure'
@@ -68,7 +69,11 @@ public class AnalyticDataManager {
                         AnalyticDataEntry[] swipeArray = new AnalyticDataEntry[swipe.size()];
                         swipe.toArray(swipeArray);
                         AnalyticDataFeatureSet featureSet = new AnalyticDataFeatureSet(swipeArray);
-                        runningUserAverage = runningUserAverage.add(featureSet);
+                        if (runningUserAverage == null) {
+                            runningUserAverage = featureSet;
+                        }else{
+                            runningUserAverage = runningUserAverage.add(featureSet);
+                        }
                         //runningUserAverage;
                         //Log.d("", featureSet.toString());
                         //Log.d("", featureSet.toDebugString());
@@ -81,10 +86,13 @@ public class AnalyticDataManager {
             float invSwipeCount = 1f/((float)trueSwipeCount);
             runningUserAverage = runningUserAverage.scale(invSwipeCount);
 
+            ArrayList<Float> dists = new ArrayList<Float>();
             float largestDist = Float.MIN_VALUE;
-
-            while (CSVParserThread == thisThread && (currentLine = br.readLine()) != null) {
-
+            float smallDist = Float.MAX_VALUE;
+            br.close();
+            inStream = context.getResources().openRawResource(usersCSVs[selectedUserIndex]);
+            br = new BufferedReader(new InputStreamReader(inStream));
+            while ((currentLine = br.readLine()) != null) {
                 //From CSV:
                 //{0}'phone ID',{1}'user ID',{2}'document ID',{3}'time[ms]',{4}'action'
                 //{5}'phone orientation',{6}'x-coordinate',{7}'y-coordinate',{8}'pressure'
@@ -115,17 +123,25 @@ public class AnalyticDataManager {
                         AnalyticDataEntry[] swipeArray = new AnalyticDataEntry[swipe.size()];
                         swipe.toArray(swipeArray);
                         AnalyticDataFeatureSet featureSet = new AnalyticDataFeatureSet(swipeArray);
-                        float distFromAvg = kNN.dist(runningUserAverage, featureSet);
-                        if (distFromAvg > maxDistanceFromAverage){
-                            Log.d("", "distFromAvg: " + Float.toString(distFromAvg));
-                            maxDistanceFromAverage = distFromAvg;
+                        float distFromAvg = kNN.weightedDist(runningUserAverage, featureSet);
+                        dists.add(distFromAvg);
+                        if (distFromAvg > largestDist){
+                            //Log.d("", "largest: " + Float.toString(distFromAvg));
+                            largestDist = distFromAvg;
+                        }
+                        if (distFromAvg < smallDist){
+                            //Log.d("", "smallest: " + Float.toString(distFromAvg));
+                            smallDist = distFromAvg;
                         }
                     }
                 }
             }
 
-
-
+            Float[] distances = new Float[dists.size()];
+            dists.toArray(distances);
+            Arrays.sort(distances);
+            float medDist = distances[distances.length/2];
+            Log.d("", "medDist: " + medDist);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -136,7 +152,7 @@ public class AnalyticDataManager {
     }
 
     public void switchSelectedUser(int index){
-
+        selectedUserIndex = index;
     }
 
     //ideally this will be the entirety of one user's calibration test

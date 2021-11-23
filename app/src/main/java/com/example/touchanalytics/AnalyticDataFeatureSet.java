@@ -353,8 +353,8 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
             medianAccelAtFirst5Points,vel20per,vel50per,vel80per,accel20per,accel50per,accel80per,
             deviation20PercFromEtoELine,deviation50PercFromEtoELine,deviation80PercFromEtoELine,
             dirEtoELine,avgDir,startx,stopx,starty,stopy,strokeDuration,phoneOrientation,udlrFlag*/
-            newFeatureSet = new AnalyticDataFeatureSet(userId, midStrokeArea+sec.midStrokeArea,
-                    midStrokePressure+sec.midStrokePressure, avgVel+sec.avgVel, directEtoEDist + sec.directEtoEDist,
+            newFeatureSet = new AnalyticDataFeatureSet(userId, midStrokeArea + sec.midStrokeArea,
+                    midStrokePressure + sec.midStrokePressure, avgVel + sec.avgVel, directEtoEDist + sec.directEtoEDist,
                     lengthOfTrajectory + sec.lengthOfTrajectory,
                     ratiodirectEtoEDistandlengthOfTrajectory + sec.ratiodirectEtoEDistandlengthOfTrajectory,
                     largestDeviationFromEtoELine + sec.largestDeviationFromEtoELine, medianVelocityAtLast3pts + sec.medianVelocityAtLast3pts,
@@ -368,6 +368,28 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
 
             return newFeatureSet;
         }
+    }
+
+    public AnalyticDataFeatureSet subForkNN(AnalyticDataFeatureSet sec){
+        AnalyticDataFeatureSet newFeatureSet;
+            /*userId,midStrokeArea,midStrokePressure,avgVel,directEtoEDist,lengthOfTrajectory,
+            ratiodirectEtoEDistandlengthOfTrajectory,largestDeviationFromEtoELine,medianVelocityAtLast3pts,
+            medianAccelAtFirst5Points,vel20per,vel50per,vel80per,accel20per,accel50per,accel80per,
+            deviation20PercFromEtoELine,deviation50PercFromEtoELine,deviation80PercFromEtoELine,
+            dirEtoELine,avgDir,startx,stopx,starty,stopy,strokeDuration,phoneOrientation,udlrFlag*/
+        newFeatureSet = new AnalyticDataFeatureSet(-1, midStrokeArea - sec.midStrokeArea,
+                midStrokePressure - sec.midStrokePressure, avgVel - sec.avgVel, directEtoEDist - sec.directEtoEDist,
+                lengthOfTrajectory - sec.lengthOfTrajectory,
+                ratiodirectEtoEDistandlengthOfTrajectory - sec.ratiodirectEtoEDistandlengthOfTrajectory,
+                largestDeviationFromEtoELine - sec.largestDeviationFromEtoELine, medianVelocityAtLast3pts - sec.medianVelocityAtLast3pts,
+                medianAccelAtFirst5Points - sec.medianAccelAtFirst5Points, vel20per - sec.vel20per,
+                vel50per - sec.vel50per, vel80per - sec.vel80per, accel20per - sec.accel20per, accel50per - sec.accel50per,
+                accel80per - sec.accel80per, deviation20PercFromEtoELine - sec.deviation20PercFromEtoELine,
+                deviation50PercFromEtoELine - sec.deviation50PercFromEtoELine, deviation80PercFromEtoELine - sec.deviation80PercFromEtoELine,
+                subVec(dirEtoELine, sec.dirEtoELine), subVec(avgDir, sec.avgDir), startx - sec.startx,
+                stopx - sec.stopx, starty - sec.starty, stopy - sec.stopy, strokeDuration - sec.strokeDuration,
+                phoneOrientation - sec.phoneOrientation, udlrFlag - sec.udlrFlag);
+        return newFeatureSet;
     }
 
     public AnalyticDataFeatureSet scale(float scaler){

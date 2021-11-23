@@ -80,6 +80,52 @@ public class AnalyticDataManager {
             }
             float invSwipeCount = 1f/((float)trueSwipeCount);
             runningUserAverage = runningUserAverage.scale(invSwipeCount);
+
+            float largestDist = Float.MIN_VALUE;
+
+            while (CSVParserThread == thisThread && (currentLine = br.readLine()) != null) {
+
+                //From CSV:
+                //{0}'phone ID',{1}'user ID',{2}'document ID',{3}'time[ms]',{4}'action'
+                //{5}'phone orientation',{6}'x-coordinate',{7}'y-coordinate',{8}'pressure'
+                //{9}'area covered',{10}'finger orientation'.
+                //What we are using:
+                //L{0}'userID',L{1}'eventTime[ms]',I{2}'action',I{3}'phoneOrientation'
+                //F{4}'xcoord',F{5}'ycoord',F{6}'pressure',F{7}'area covered'
+                String[] dataRowVals = currentLine.split(",");
+
+                //the index passed in here will be from the first list above
+                long userId = Long.parseLong(dataRowVals[1]);
+                long eventTime = Long.parseLong(dataRowVals[3]);
+                int action = Integer.parseInt(dataRowVals[4]);
+                int phoneOrientation = Integer.parseInt(dataRowVals[5]);
+                float xCoord = Float.parseFloat(dataRowVals[6]);
+                float yCoord = Float.parseFloat(dataRowVals[7]);
+                float pressure = Float.parseFloat(dataRowVals[8]);
+                float size = Float.parseFloat(dataRowVals[9]);
+                if (action == 0) {
+                    swipe = new ArrayList<AnalyticDataEntry>();
+                }
+                AnalyticDataEntry dataEntry = new AnalyticDataEntry(userId, eventTime, action,
+                        phoneOrientation, xCoord, yCoord, pressure, size);
+                swipe.add(dataEntry);
+
+                if (action == 1){
+                    if (swipe.size() > 6){
+                        AnalyticDataEntry[] swipeArray = new AnalyticDataEntry[swipe.size()];
+                        swipe.toArray(swipeArray);
+                        AnalyticDataFeatureSet featureSet = new AnalyticDataFeatureSet(swipeArray);
+                        float distFromAvg = kNN.dist(runningUserAverage, featureSet);
+                        if (distFromAvg > maxDistanceFromAverage){
+                            Log.d("", "distFromAvg: " + Float.toString(distFromAvg));
+                            maxDistanceFromAverage = distFromAvg;
+                        }
+                    }
+                }
+            }
+
+
+
         }catch (Exception e){
             e.printStackTrace();
         }

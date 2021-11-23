@@ -272,78 +272,78 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
 
     public String toDebugString(){
         String res = "";
-        res += "userId: " + Long.toString(userId) + "\n";
-        res += "midStrokeArea: " + Float.toString(midStrokeArea) + "\n";
-        res += "midStrokePressure: " + Float.toString(midStrokePressure) + "\n";
-        res += "avgVel: " + Float.toString(avgVel) + "\n";
-        res += "directEtoEDist: " + Float.toString(directEtoEDist) + "\n";
-        res += "lengthOfTrajectory: " + Float.toString(lengthOfTrajectory) + "\n";
-        res += "ratiodirectEtoEDistandlengthOfTrajectory: " + Float.toString(ratiodirectEtoEDistandlengthOfTrajectory) + "\n";
-        res += "largestDeviationFromEtoELine: " + Float.toString(largestDeviationFromEtoELine) + "\n";
-        //res += "meanResultantLength: " + Float.toString(meanResultantLength) + "\n";
-        res += "medianVelocityAtLast3pts: " + Float.toString(medianVelocityAtLast3pts) + "\n";
-        res += "medianAccelAtFirst5Points: " + Float.toString(medianAccelAtFirst5Points) + "\n";
-        res += "vel20per: " + Float.toString(vel20per) + "\n";
-        res += "vel50per: " + Float.toString(vel50per) + "\n";
-        res += "vel80per: " + Float.toString(vel80per) + "\n";
-        res += "accel20per: " + Float.toString(accel20per) + "\n";
-        res += "accel50per: " + Float.toString(accel50per) + "\n";
-        res += "accel80per: " + Float.toString(accel80per) + "\n";
-        res += "deviation20PercFromEtoELine: " + Float.toString(deviation20PercFromEtoELine) + "\n";
-        res += "deviation50PercFromEtoELine: " + Float.toString(deviation50PercFromEtoELine) + "\n";
-        res += "deviation80PercFromEtoELine: " + Float.toString(deviation80PercFromEtoELine) + "\n";
+        res += "userId: " + userId + "\n";
+        res += "midStrokeArea: " + midStrokeArea + "\n";
+        res += "midStrokePressure: " + midStrokePressure + "\n";
+        res += "avgVel: " + avgVel + "\n";
+        res += "directEtoEDist: " + directEtoEDist + "\n";
+        res += "lengthOfTrajectory: " + lengthOfTrajectory + "\n";
+        res += "ratiodirectEtoEDistandlengthOfTrajectory: " + ratiodirectEtoEDistandlengthOfTrajectory + "\n";
+        res += "largestDeviationFromEtoELine: " + largestDeviationFromEtoELine + "\n";
+        //res += "meanResultantLength: " + meanResultantLength + "\n";
+        res += "medianVelocityAtLast3pts: " + medianVelocityAtLast3pts + "\n";
+        res += "medianAccelAtFirst5Points: " + medianAccelAtFirst5Points + "\n";
+        res += "vel20per: " + vel20per + "\n";
+        res += "vel50per: " + vel50per + "\n";
+        res += "vel80per: " + vel80per + "\n";
+        res += "accel20per: " + accel20per + "\n";
+        res += "accel50per: " + accel50per + "\n";
+        res += "accel80per: " + accel80per + "\n";
+        res += "deviation20PercFromEtoELine: " + deviation20PercFromEtoELine + "\n";
+        res += "deviation50PercFromEtoELine: " + deviation50PercFromEtoELine + "\n";
+        res += "deviation80PercFromEtoELine: " + deviation80PercFromEtoELine + "\n";
 
-        res+= "dirEtoELine: [" + Float.toString(dirEtoELine[0]) + ", " + Float.toString(dirEtoELine[1]) + "]\n";
-        res+= "avgDir: [" + Float.toString(avgDir[0]) + ", " + Float.toString(avgDir[1]) + "]\n";
+        res+= "dirEtoELine: [" + dirEtoELine[0] + ", " + dirEtoELine[1] + "]\n";
+        res+= "avgDir: [" + avgDir[0] + ", " + avgDir[1] +"]\n";
 
-        res += "startx: " + Float.toString(startx) + "\n";
-        res += "stopx: " + Float.toString(stopx) + "\n";
-        res += "starty: " + Float.toString(starty) + "\n";
-        res += "stopy: " + Float.toString(stopy) + "\n";
+        res += "startx: " + startx + "\n";
+        res += "stopx: " + stopx + "\n";
+        res += "starty: " + starty + "\n";
+        res += "stopy: " + stopy + "\n";
 
-        res+= "strokeDuration: " + Long.toString(strokeDuration) + "\n";
+        res+= "strokeDuration: " + strokeDuration + "\n";
 
-        res += "phoneOrientation: " + Integer.toString(phoneOrientation) + "\n";
-        res += "udlrFlag: " + Integer.toString(udlrFlag);
+        res += "phoneOrientation: " + phoneOrientation + "\n";
+        res += "udlrFlag: " + udlrFlag;
 
         return res;
     }
 
     public String toString(){
         String res = "";
-        res += Long.toString(userId) +',';
-        res += Float.toString(midStrokeArea) +',';
-        res += Float.toString(midStrokePressure) +',';
-        res += Float.toString(avgVel) +',';
-        res += Float.toString(directEtoEDist) +',';
-        res += Float.toString(lengthOfTrajectory) +',';
-        res += Float.toString(ratiodirectEtoEDistandlengthOfTrajectory) +',';
-        res += Float.toString(largestDeviationFromEtoELine) +',';
+        res += userId +',';
+        res += midStrokeArea +',';
+        res += midStrokePressure +',';
+        res += avgVel +',';
+        res += directEtoEDist +',';
+        res += lengthOfTrajectory +',';
+        res += ratiodirectEtoEDistandlengthOfTrajectory +',';
+        res += largestDeviationFromEtoELine +',';
         //res += Float.toString(meanResultantLength) +',';
-        res += Float.toString(medianVelocityAtLast3pts) +',';
-        res += Float.toString(medianAccelAtFirst5Points) +',';
-        res += Float.toString(vel20per) +',';
-        res += Float.toString(vel50per) +',';
-        res += Float.toString(vel80per) +',';
-        res += Float.toString(accel20per) +',';
-        res += Float.toString(accel50per) +',';
-        res += Float.toString(accel80per) +',';
-        res += Float.toString(deviation20PercFromEtoELine) +',';
-        res += Float.toString(deviation50PercFromEtoELine) +',';
-        res += Float.toString(deviation80PercFromEtoELine) +',';
+        res += medianVelocityAtLast3pts +',';
+        res += medianAccelAtFirst5Points +',';
+        res += vel20per +',';
+        res += vel50per +',';
+        res += vel80per +',';
+        res += accel20per +',';
+        res += accel50per +',';
+        res += accel80per +',';
+        res += deviation20PercFromEtoELine +',';
+        res += deviation50PercFromEtoELine +',';
+        res += deviation80PercFromEtoELine +',';
 
-        res += Float.toString(dirEtoELine[0]) + " " + Float.toString(dirEtoELine[1]) + ',';
-        res += Float.toString(avgDir[0]) + " " + Float.toString(avgDir[1]) + ',';
+        res += dirEtoELine[0] + " " + dirEtoELine[1] + ',';
+        res += avgDir[0] + " " + avgDir[1] + ',';
 
-        res += Float.toString(startx) +',';
-        res += Float.toString(stopx) +',';
-        res += Float.toString(starty) +',';
-        res += Float.toString(stopy) +',';
+        res += startx + ',';
+        res += stopx + ',';
+        res += starty + ',';
+        res += stopy + ',';
 
-        res += Long.toString(strokeDuration) +',';
+        res += strokeDuration + ',';
 
-        res += Integer.toString(phoneOrientation) +',';
-        res += Integer.toString(udlrFlag);
+        res += phoneOrientation +',';
+        res += udlrFlag;
 
         return res;
     }

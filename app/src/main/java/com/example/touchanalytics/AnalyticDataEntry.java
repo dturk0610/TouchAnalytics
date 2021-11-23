@@ -91,14 +91,14 @@ public class AnalyticDataEntry implements java.io.Serializable {
 
     public String ToString() {
         String ret = "";
-        ret += Long.toString(userId) + ",";
-        ret += Long.toString(eventTime) + ",";
-        ret += Integer.toString(action) + ",";
-        ret += Integer.toString(phoneOrientation) + ",";
-        ret += Float.toString(xCoord) + ",";
-        ret += Float.toString(yCoord) + ",";
-        ret += Float.toString(pressure) + ",";
-        ret += Float.toString(size);
+        ret += userId + ",";
+        ret += eventTime + ",";
+        ret += action + ",";
+        ret += phoneOrientation + ",";
+        ret += xCoord + ",";
+        ret += yCoord + ",";
+        ret += pressure + ",";
+        ret += size;
         return ret;
     }
 }

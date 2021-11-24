@@ -115,7 +115,7 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
             midStrokePressure = swipe[arrSize / 2].pressure;
             startx = swipe[0].xCoord;
             stopx = swipe[arrSize - 1].xCoord;
-            starty = swipe[0].xCoord;
+            starty = swipe[0].yCoord;
             stopy = swipe[arrSize - 1].yCoord;
             float[] startPos = {startx, starty};
             float[] stopPos = {stopx, stopy};

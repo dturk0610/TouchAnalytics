@@ -1,8 +1,11 @@
 package com.example.touchanalytics;
 
 import android.content.Context;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.renderscript.ScriptGroup;
 import android.util.Log;
+import android.view.MotionEvent;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -12,9 +15,10 @@ import java.util.Arrays;
 import java.util.EventListener;
 import java.util.List;
 
-public class AnalyticDataManager {
+public class AnalyticDataManager implements Parcelable {
     public int selectedUserIndex;
     public int[] usersCSVs;
+    public long userID;
     public ArrayList<AnalyticDataFeatureSet> featuresOfCurrentUser;
     AnalyticDataFeatureSet runningUserAverage;
     float maxDistanceFromAverage = Float.MIN_VALUE;
@@ -30,6 +34,25 @@ public class AnalyticDataManager {
         CSVParserThread = new Thread(this::parseCSV);
         CSVParserThread.run();
     }
+
+    protected AnalyticDataManager(Parcel in) {
+        selectedUserIndex = in.readInt();
+        usersCSVs = in.createIntArray();
+        userID = in.readLong();
+        maxDistanceFromAverage = in.readFloat();
+    }
+
+    public static final Creator<AnalyticDataManager> CREATOR = new Creator<AnalyticDataManager>() {
+        @Override
+        public AnalyticDataManager createFromParcel(Parcel in) {
+            return new AnalyticDataManager(in);
+        }
+
+        @Override
+        public AnalyticDataManager[] newArray(int size) {
+            return new AnalyticDataManager[size];
+        }
+    };
 
     public void parseCSV(){
         try {
@@ -57,14 +80,15 @@ public class AnalyticDataManager {
                 float yCoord = Float.parseFloat(dataRowVals[7]);
                 float pressure = Float.parseFloat(dataRowVals[8]);
                 float size = Float.parseFloat(dataRowVals[9]);
-                if (action == 0) {
+                if (action == MotionEvent.ACTION_DOWN) {
+                    this.userID = userId;
                     swipe = new ArrayList<AnalyticDataEntry>();
                 }
                 AnalyticDataEntry dataEntry = new AnalyticDataEntry(userId, eventTime, action,
                         phoneOrientation, xCoord, yCoord, pressure, size);
                 swipe.add(dataEntry);
 
-                if (action == 1){
+                if (action == MotionEvent.ACTION_UP){
                     if (swipe.size() > 6){
                         AnalyticDataEntry[] swipeArray = new AnalyticDataEntry[swipe.size()];
                         swipe.toArray(swipeArray);
@@ -111,14 +135,14 @@ public class AnalyticDataManager {
                 float yCoord = Float.parseFloat(dataRowVals[7]);
                 float pressure = Float.parseFloat(dataRowVals[8]);
                 float size = Float.parseFloat(dataRowVals[9]);
-                if (action == 0) {
+                if (action == MotionEvent.ACTION_DOWN) {
                     swipe = new ArrayList<AnalyticDataEntry>();
                 }
                 AnalyticDataEntry dataEntry = new AnalyticDataEntry(userId, eventTime, action,
                         phoneOrientation, xCoord, yCoord, pressure, size);
                 swipe.add(dataEntry);
 
-                if (action == 1){
+                if (action == MotionEvent.ACTION_UP){
                     if (swipe.size() > 6){
                         AnalyticDataEntry[] swipeArray = new AnalyticDataEntry[swipe.size()];
                         swipe.toArray(swipeArray);
@@ -147,8 +171,16 @@ public class AnalyticDataManager {
         }
     }
 
-    public class trainUserSet implements EventListener {
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(selectedUserIndex);
+        parcel.writeArray(new int[][]{usersCSVs});
+        parcel.writeLong(userID);
     }
 
     public void switchSelectedUser(int index){

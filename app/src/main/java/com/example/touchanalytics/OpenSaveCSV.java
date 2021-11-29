@@ -32,8 +32,8 @@ import java.util.stream.Stream;
 
 public class OpenSaveCSV extends AppCompatActivity {
 
-    static File DCIMDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-    static String dataPath = "data/";
+    //static File DCIMDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+    //static String dataPath = "data/";
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
@@ -44,6 +44,7 @@ public class OpenSaveCSV extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        /*
         InputStream inStream = getResources().openRawResource(R.raw.data);
         try{
             BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
@@ -56,6 +57,7 @@ public class OpenSaveCSV extends AppCompatActivity {
         }catch(IOException ioe){
             ioe.printStackTrace();
         }
+        */
     }
 
     public static void verifyStoragePermissions(Activity activity) {
@@ -73,20 +75,30 @@ public class OpenSaveCSV extends AppCompatActivity {
     }
 
     public static boolean WriteToCSV(Context context, ConcurrentLinkedQueue<AnalyticDataEntry> collectionOfSwipes){
-        File filesDir = context.getFilesDir();
-        File dataDir = new File(filesDir, "data");
-        if (!dataDir.exists()) {
-            dataDir.mkdirs();
-            Log.d("", "Making data directory");
+        File DCIMDir = context.getExternalFilesDir(Environment.DIRECTORY_DCIM);
+        File dataDCIMDir = new File(DCIMDir, "data");
+        if (!dataDCIMDir.exists()){
+            boolean worked = dataDCIMDir.mkdirs();
+            if (!worked){
+                Log.d("uhohh", "uh oh");
+                return false;
+            }
+            Log.d("", "Making DCIM Data path");
         }
-        File[] files = dataDir.listFiles();
-        int count = files.length;
+
+        File[] filesDCIM = dataDCIMDir.listFiles();
+        int count = (filesDCIM != null) ? filesDCIM.length : -1;
+        if (count == -1){
+            Log.d("", "other uh oh");
+        }
         Log.d("", "count: " + count);
         String userFileName = "user" + count + ".csv";
-        File newUserFile = new  File(dataDir, userFileName);
+        File newUserFile = new  File(dataDCIMDir, userFileName);
         AnalyticDataEntry dataEntry;
+
         try (FileOutputStream fOS = new FileOutputStream(newUserFile.toString())){
             while ((dataEntry = collectionOfSwipes.poll()) != null){
+                dataEntry.userId = count;
                 String line = dataEntry + "\n";
                 fOS.write(line.getBytes());
             }

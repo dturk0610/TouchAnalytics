@@ -61,10 +61,8 @@ public class kNN {
         distance += set2mset1.deviation20PercFromEtoELine*set2mset1.deviation20PercFromEtoELine;
         distance += set2mset1.deviation50PercFromEtoELine*set2mset1.deviation50PercFromEtoELine;
         distance += set2mset1.deviation80PercFromEtoELine*set2mset1.deviation80PercFromEtoELine;
-        distance += set2mset1.dirEtoELine[0]*set2mset1.dirEtoELine[0];
-        distance += set2mset1.dirEtoELine[1]*set2mset1.dirEtoELine[1];
-        distance += set2mset1.avgDir[0]*set2mset1.avgDir[0];
-        distance += set2mset1.avgDir[1]*set2mset1.avgDir[1];
+        distance += set2mset1.dirEtoELine*set2mset1.dirEtoELine;
+        distance += set2mset1.avgDir*set2mset1.avgDir;
         distance += set2mset1.startx*set2mset1.startx;
         distance += set2mset1.stopx*set2mset1.stopx;
         distance += set2mset1.starty*set2mset1.starty;
@@ -102,10 +100,8 @@ public class kNN {
         distance += dev20PerWeight*set2mset1.deviation20PercFromEtoELine*set2mset1.deviation20PercFromEtoELine;
         distance += dev50PerWeight*set2mset1.deviation50PercFromEtoELine*set2mset1.deviation50PercFromEtoELine;
         distance += dev80PerWeight*set2mset1.deviation80PercFromEtoELine*set2mset1.deviation80PercFromEtoELine;
-        distance += dirEtoEWeight*set2mset1.dirEtoELine[0]*set2mset1.dirEtoELine[0];
-        distance += dirEtoEWeight*set2mset1.dirEtoELine[1]*set2mset1.dirEtoELine[1];
-        distance += avgDirWeight*set2mset1.avgDir[0]*set2mset1.avgDir[0];
-        distance += avgDirWeight*set2mset1.avgDir[1]*set2mset1.avgDir[1];
+        distance += dirEtoEWeight*set2mset1.dirEtoELine*set2mset1.dirEtoELine;
+        distance += avgDirWeight*set2mset1.avgDir*set2mset1.avgDir;
         distance += startxWeight*set2mset1.startx*set2mset1.startx;
         distance += stopxWeight*set2mset1.stopx*set2mset1.stopx;
         distance += startyWeight*set2mset1.starty*set2mset1.starty;

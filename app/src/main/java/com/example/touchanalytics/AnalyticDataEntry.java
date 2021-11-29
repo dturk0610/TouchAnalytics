@@ -89,7 +89,8 @@ public class AnalyticDataEntry implements java.io.Serializable {
         this.size = moEv.getSize();
     }
 
-    public String ToString() {
+    @Override
+    public String toString() {
         String ret = "";
         ret += userId + ",";
         ret += eventTime + ",";

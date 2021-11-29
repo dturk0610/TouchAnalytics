@@ -52,8 +52,8 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
     float accel20per, accel50per, accel80per;                       /*done*/
     float deviation20PercFromEtoELine,deviation50PercFromEtoELine,deviation80PercFromEtoELine; /*done*/
 
-    float[] dirEtoELine;                                            /*done*/
-    float[] avgDir;                                                 /*done*/
+    float dirEtoELine;                                            /*done*/
+    float avgDir;                                                 /*done*/
     float startx, stopx, starty, stopy;                             /*done*/
     long strokeDuration;                                            /*[ms] done*/
     int phoneOrientation;                                           /*done*/
@@ -71,7 +71,7 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
             float largestDeviationFromEtoELine, float medianVelocityAtLast3pts, float medianAccelAtFirst5Points,
             float vel20per, float vel50per, float vel80per, float accel20per, float accel50per, float accel80per,
             float deviation20PercFromEtoELine, float deviation50PercFromEtoELine, float deviation80PercFromEtoELine,
-            float[] dirEtoELine, float[] avgDir, float startx, float stopx, float starty, float stopy,
+            float dirEtoELine, float avgDir, float startx, float stopx, float starty, float stopy,
             long strokeDuration, int phoneOrientation, int udlrFlag){
         this.userId = userId;
         this.midStrokeArea = midStrokeArea;
@@ -119,11 +119,12 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
             stopy = swipe[arrSize - 1].yCoord;
             float[] startPos = {startx, starty};
             float[] stopPos = {stopx, stopy};
+            float[] diffVec = subVec(stopPos, startPos);
 
-            directEtoEDist = magVec(subVec(stopPos, startPos));
-            dirEtoELine = scaleVec(subVec(stopPos, startPos), 1/directEtoEDist);
-            float uDotDirEtoE = dotVec(dirEtoELine, u), dDotDirEtoE = dotVec(dirEtoELine, d);
-            float lDotDirEtoE = dotVec(dirEtoELine, l), rDotDirEtoE = dotVec(dirEtoELine, r);
+            directEtoEDist = magVec(diffVec);
+            dirEtoELine = (float)Math.atan(diffVec[1]/diffVec[0]);
+            float uDotDirEtoE = dotVec(diffVec, u), dDotDirEtoE = dotVec(diffVec, d);
+            float lDotDirEtoE = dotVec(diffVec, l), rDotDirEtoE = dotVec(diffVec, r);
             if ((uDotDirEtoE > dDotDirEtoE) && (uDotDirEtoE > lDotDirEtoE) && (uDotDirEtoE > rDotDirEtoE))
                 udlrFlag = 0;
             if ((dDotDirEtoE > uDotDirEtoE) && (dDotDirEtoE > lDotDirEtoE) && (dDotDirEtoE > rDotDirEtoE))
@@ -174,9 +175,10 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
             accel50per = (float)(vel50per*invPer50TimeDiff);
             accel80per = (float)(vel80per*invPer80TimeDiff);
 
-            float[] posAlongLineAt20 = addVec(scaleVec(dirEtoELine, dotVec(subVec(pos20,startPos), dirEtoELine)), startPos);
-            float[] posAlongLineAt50 = addVec(scaleVec(dirEtoELine, dotVec(subVec(pos50,startPos), dirEtoELine)), startPos);
-            float[] posAlongLineAt80 = addVec(scaleVec(dirEtoELine, dotVec(subVec(pos80,startPos), dirEtoELine)), startPos);
+            float[] normDiffVec = normVec(diffVec);
+            float[] posAlongLineAt20 = addVec(scaleVec(normDiffVec, dotVec(subVec(pos20,startPos), normDiffVec)), startPos);
+            float[] posAlongLineAt50 = addVec(scaleVec(normDiffVec, dotVec(subVec(pos50,startPos), normDiffVec)), startPos);
+            float[] posAlongLineAt80 = addVec(scaleVec(normDiffVec, dotVec(subVec(pos80,startPos), normDiffVec)), startPos);
 
             deviation20PercFromEtoELine = magVec(subVec(pos20, posAlongLineAt20));
             deviation50PercFromEtoELine = magVec(subVec(pos50, posAlongLineAt50));
@@ -184,7 +186,7 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
 
             avgVel = 0;
             lengthOfTrajectory = 0;
-            avgDir = new float[]{0, 0};
+            avgDir = 0;
             largestDeviationFromEtoELine = 0;
 
             float[] pos0 = {swipe[0].xCoord, swipe[0].yCoord};
@@ -212,7 +214,7 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
             //                                  -2 to get us to actually last point since the
             //                                  last and second to last are the same, -[0-3] for
             //                                  obvious reasons
-            int lastInd = arrSize - 2 - 0;
+            int lastInd = arrSize - 2;
             int secToLasInd = lastInd - 1;
             int thrToLasInd = secToLasInd - 1;
             int fourToLasInd = thrToLasInd - 1;
@@ -240,13 +242,9 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
                 float[] lastPos = new float[]{prevData.xCoord, prevData.yCoord};
                 float[] displacement = subVec(currPos, lastPos);
                 float magDisp = magVec(displacement);
-                float[] currDir;
-                if (magDisp != 0)
-                    currDir = scaleVec(displacement, 1f/magDisp);
-                else
-                    currDir = new float[] {0, 0};
+                float currDir = (float)Math.atan(displacement[1]/displacement[0]);
                 lengthOfTrajectory +=magDisp;
-                avgDir = addVec(avgDir, currDir);
+                avgDir += currDir*invArrSize;
 
                 long currTime = currData.eventTime;
                 long lastTime = prevData.eventTime;
@@ -255,13 +253,12 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
                 float currVel = (float)(magDisp*invTimeStep);
                 avgVel += currVel*invArrSize;
 
-                float[] posAlongLine = addVec(scaleVec(dirEtoELine, dotVec(subVec(currPos,startPos), dirEtoELine)), startPos);
+                float[] posAlongLine = addVec(scaleVec(normDiffVec, dotVec(subVec(currPos,startPos), normDiffVec)), startPos);
 
                 float currDeviation = magVec(subVec(currPos, posAlongLine));
                 if (currDeviation > largestDeviationFromEtoELine)
                     largestDeviationFromEtoELine = currDeviation;
             }
-            avgDir = scaleVec(avgDir, 1/magVec(avgDir));
             ratiodirectEtoEDistandlengthOfTrajectory = directEtoEDist/lengthOfTrajectory;
 
         }
@@ -293,8 +290,8 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
         res += "deviation50PercFromEtoELine: " + deviation50PercFromEtoELine + "\n";
         res += "deviation80PercFromEtoELine: " + deviation80PercFromEtoELine + "\n";
 
-        res+= "dirEtoELine: [" + dirEtoELine[0] + ", " + dirEtoELine[1] + "]\n";
-        res+= "avgDir: [" + avgDir[0] + ", " + avgDir[1] +"]\n";
+        res+= "dirEtoELine: " + dirEtoELine + "\n";
+        res+= "avgDir: " + avgDir +"\n";
 
         res += "startx: " + startx + "\n";
         res += "stopx: " + stopx + "\n";
@@ -332,8 +329,8 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
         res += deviation50PercFromEtoELine +',';
         res += deviation80PercFromEtoELine +',';
 
-        res += dirEtoELine[0] + " " + dirEtoELine[1] + ',';
-        res += avgDir[0] + " " + avgDir[1] + ',';
+        res += dirEtoELine + ',';
+        res += avgDir + ',';
 
         res += startx + ',';
         res += stopx + ',';
@@ -367,7 +364,7 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
                     vel50per + sec.vel50per, vel80per + sec.vel80per, accel20per + sec.accel20per, accel50per + sec.accel50per,
                     accel80per + sec.accel80per, deviation20PercFromEtoELine + sec.deviation20PercFromEtoELine,
                     deviation50PercFromEtoELine + sec.deviation50PercFromEtoELine, deviation80PercFromEtoELine + sec.deviation80PercFromEtoELine,
-                    addVec(dirEtoELine, sec.dirEtoELine), addVec(avgDir, sec.avgDir), startx + sec.startx,
+                    dirEtoELine + sec.dirEtoELine, avgDir + sec.avgDir, startx + sec.startx,
                     stopx + sec.stopx, starty + sec.starty, stopy + sec.stopy, strokeDuration + sec.strokeDuration,
                     phoneOrientation + sec.phoneOrientation, udlrFlag + sec.udlrFlag);
 
@@ -391,7 +388,7 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
                 vel50per - sec.vel50per, vel80per - sec.vel80per, accel20per - sec.accel20per, accel50per - sec.accel50per,
                 accel80per - sec.accel80per, deviation20PercFromEtoELine - sec.deviation20PercFromEtoELine,
                 deviation50PercFromEtoELine - sec.deviation50PercFromEtoELine, deviation80PercFromEtoELine - sec.deviation80PercFromEtoELine,
-                subVec(dirEtoELine, sec.dirEtoELine), subVec(avgDir, sec.avgDir), startx - sec.startx,
+                dirEtoELine - sec.dirEtoELine,avgDir- sec.avgDir, startx - sec.startx,
                 stopx - sec.stopx, starty - sec.starty, stopy - sec.stopy, strokeDuration - sec.strokeDuration,
                 phoneOrientation - sec.phoneOrientation, udlrFlag - sec.udlrFlag);
         return newFeatureSet;
@@ -400,15 +397,15 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
     public AnalyticDataFeatureSet scale(float scaler){
         AnalyticDataFeatureSet newFeatureSet;
         newFeatureSet = new AnalyticDataFeatureSet(userId, midStrokeArea*scaler,
-                midStrokePressure*scaler, avgVel*scaler, directEtoEDist *scaler,
-                lengthOfTrajectory *scaler, ratiodirectEtoEDistandlengthOfTrajectory*scaler,
-                largestDeviationFromEtoELine *scaler, medianVelocityAtLast3pts *scaler,
-                medianAccelAtFirst5Points *scaler, vel20per *scaler,
-                vel50per *scaler, vel80per *scaler, accel20per *scaler, accel50per *scaler,
-                accel80per *scaler, deviation20PercFromEtoELine *scaler,
+                midStrokePressure*scaler, avgVel *scaler, directEtoEDist*scaler,
+                lengthOfTrajectory*scaler, ratiodirectEtoEDistandlengthOfTrajectory*scaler,
+                largestDeviationFromEtoELine*scaler, medianVelocityAtLast3pts*scaler,
+                medianAccelAtFirst5Points*scaler, vel20per*scaler,
+                vel50per*scaler, vel80per*scaler, accel20per*scaler, accel50per*scaler,
+                accel80per*scaler, deviation20PercFromEtoELine *scaler,
                 deviation50PercFromEtoELine *scaler, deviation80PercFromEtoELine *scaler,
-                scaleVec(dirEtoELine, 1/magVec(dirEtoELine)), scaleVec(avgDir, 1/magVec(avgDir)), startx *scaler,
-                stopx *scaler, starty *scaler, stopy *scaler, (int)(strokeDuration*scaler),
+                dirEtoELine*scaler, avgDir*scaler, startx*scaler,
+                stopx*scaler, starty*scaler, stopy*scaler, (int)(strokeDuration*scaler),
                 (int)(phoneOrientation*scaler), (int)(udlrFlag*scaler));
         return newFeatureSet;
     }
@@ -418,4 +415,8 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
     private float[] subVec(float[] a, float[] b)       { return new float[]{a[0] - b[0], a[1] - b[1]}; }
     private float[] scaleVec(float[] pos, float scale)  { return new float[]{pos[0] * scale, pos[1] * scale}; }
     private float magVec(float[] v)                    { return (float)Math.sqrt(v[0]*v[0]+v[1]*v[1]); }
+    private float[] normVec(float[] v) {
+        float invmag = 1/magVec(v);
+        return new float[]{v[0]*invmag, v[1]*invmag};
+    }
 }

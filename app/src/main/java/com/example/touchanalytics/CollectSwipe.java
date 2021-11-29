@@ -1,10 +1,12 @@
 package com.example.touchanalytics;
 
+import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -27,6 +29,8 @@ public class CollectSwipe extends AppCompatActivity{
         setContentView(R.layout.confirm_registration);               ///////here we will set the view
         swipe = new ConcurrentLinkedQueue<>();
         fullCollect = new ConcurrentLinkedQueue<>();
+        ImageView imgView = findViewById(R.id.idIVcourse2);
+        imgView.setImageDrawable(ImageSelect.RandomImage(this));
         //Intent openCSV = new Intent(this, OpenSaveCSV.class);
         //startActivity(openCSV);
     }

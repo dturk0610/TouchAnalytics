@@ -1,6 +1,10 @@
 package com.example.touchanalytics;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.lang.*;
@@ -11,7 +15,7 @@ public class ImageSelect extends AppCompatActivity {
 
     private static int numOfImagesEach = 21;
 
-    public Drawable RandomImage() {
+    public static Drawable RandomImage(Context context) {
 
         char animalChar;
         int index = ((int) Math.round(Math.random()) ) * (numOfImagesEach-1) + 1;
@@ -29,9 +33,11 @@ public class ImageSelect extends AppCompatActivity {
             //animalStr = "dogs";
         }
 
-        String pathName= "res/drawables/" + animalChar + index + ".jpg";
-
-        return Drawable.createFromPath(pathName);
+        String pathName = animalChar + "" + index;
+        Log.d("", pathName);
+        Resources resources = context.getResources();
+        int id = resources.getIdentifier(pathName,"drawable", context.getPackageName());
+        return resources.getDrawable(id, context.getTheme());
 
     }
 }

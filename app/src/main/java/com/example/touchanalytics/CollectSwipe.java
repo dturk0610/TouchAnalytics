@@ -30,7 +30,7 @@ public class CollectSwipe extends AppCompatActivity{
         swipe = new ConcurrentLinkedQueue<>();
         fullCollect = new ConcurrentLinkedQueue<>();
         ImageView imgView = findViewById(R.id.idIVcourse2);
-        imgView.setImageDrawable(ImageSelect.RandomImage(this));
+        //imgView.setImageDrawable(ImageSelect.RandomImage(this));
         //Intent openCSV = new Intent(this, OpenSaveCSV.class);
         //startActivity(openCSV);
     }

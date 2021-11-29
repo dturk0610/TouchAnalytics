@@ -18,7 +18,7 @@ public class ImageSelect extends AppCompatActivity {
     public static Drawable RandomImage(Context context) {
 
         char animalChar;
-        int index = ((int) Math.round(Math.random()) ) * (numOfImagesEach-1) + 1;
+        int index = (int)(Math.random()*numOfImagesEach) + 1;
         int animalInt = (int) Math.round(Math.random());
         //String animalStr;
 

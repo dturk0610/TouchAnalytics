@@ -24,7 +24,7 @@ public class CollectSwipe extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         Bundle bundle = getIntent().getExtras();
         this.manager = bundle.getParcelable("manager");
-        setContentView(R.layout.activity_main);               ///////here we will set the view
+        setContentView(R.layout.confirm_registration);               ///////here we will set the view
         swipe = new ConcurrentLinkedQueue<>();
         fullCollect = new ConcurrentLinkedQueue<>();
         //Intent openCSV = new Intent(this, OpenSaveCSV.class);

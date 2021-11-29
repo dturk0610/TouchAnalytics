@@ -16,20 +16,20 @@ public class ImageSelect extends AppCompatActivity {
         char animalChar;
         int index = ((int) Math.round(Math.random()) ) * (numOfImagesEach-1) + 1;
         int animalInt = (int) Math.round(Math.random());
-        String animalStr;
+        //String animalStr;
 
         if (animalInt == 0)
         {
             animalChar = 'c';
-            animalStr = "cats";
+            //animalStr = "cats";
         }
         else
         {
             animalChar = 'd';
-            animalStr = "dogs";
+            //animalStr = "dogs";
         }
 
-        String pathName= "res/drawables/" + animalStr + '/' + animalChar + index + ".jpg";
+        String pathName= "res/drawables/" + animalChar + index + ".jpg";
 
         return Drawable.createFromPath(pathName);
 

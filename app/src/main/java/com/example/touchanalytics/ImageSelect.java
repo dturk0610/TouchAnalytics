@@ -9,12 +9,11 @@ import java.lang.Math;
 
 public class ImageSelect extends AppCompatActivity {
 
-    private char animalChar;
-
-    public static int numOfImagesEach = 21;
+    private static int numOfImagesEach = 21;
 
     public Drawable RandomImage() {
 
+        char animalChar;
         int index = ((int) Math.round(Math.random()) ) * (numOfImagesEach-1) + 1;
         int animalInt = (int) Math.round(Math.random());
         String animalStr;

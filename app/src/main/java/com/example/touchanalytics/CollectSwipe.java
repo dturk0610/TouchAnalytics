@@ -64,7 +64,7 @@ public class CollectSwipe extends AppCompatActivity{
                 swipe.clear();
                 AnalyticDataFeatureSet feature = new AnalyticDataFeatureSet(swipeArr);
                 Log.d("", "feature:" + feature.toDebugString());
-                if (numOfSwipes >= 5){
+                if (numOfSwipes >= 20){
                     OpenSaveCSV.WriteToCSV(this, fullCollect);
                     numOfSwipes = 0;
                     fullCollect = new ConcurrentLinkedQueue<>();

@@ -145,11 +145,11 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
             int per80Size = (int)(arrSize*.8f);
 
             double per20TimeDiff = (swipe[per20Size].eventTime - swipe[per20Size - 1].eventTime)*.001;
-            double invPer20TimeDiff = 1/per20TimeDiff;
+            double invPer20TimeDiff = (per20TimeDiff != 0) ? 1/per20TimeDiff : 0;
             double per50TimeDiff = (swipe[per50Size].eventTime - swipe[per50Size - 1].eventTime)*.001;
-            double invPer50TimeDiff = 1/per50TimeDiff;
+            double invPer50TimeDiff = (per50TimeDiff !=0 ) ?  1/per50TimeDiff : 0;
             double per80TimeDiff = (swipe[per80Size].eventTime - swipe[per80Size - 1].eventTime)*.001;
-            double invPer80TimeDiff = 1/per80TimeDiff;
+            double invPer80TimeDiff = (per80TimeDiff !=0 ) ?  1/per80TimeDiff : 0;
 
             float pos20x = swipe[per20Size].xCoord;
             float pos50x = swipe[per50Size].xCoord;
@@ -242,17 +242,26 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
                 float[] lastPos = new float[]{prevData.xCoord, prevData.yCoord};
                 float[] displacement = subVec(currPos, lastPos);
                 float magDisp = magVec(displacement);
-                float currDir = (float)Math.atan(displacement[1]/displacement[0]);
+                float currDir = 0;
+                if (displacement[0] != 0){
+                    currDir = (float)Math.atan(displacement[1]/displacement[0]);
+                }
+                else{
+                    float negator = 1f;
+                    if (displacement[1] < 0)
+                        negator = -1f;
+                    currDir = negator*90*(float)Math.PI/180f;
+                }
                 lengthOfTrajectory +=magDisp;
                 avgDir += currDir*invArrSize;
 
                 long currTime = currData.eventTime;
                 long lastTime = prevData.eventTime;
-                double invTimeStep = 1/((currTime - lastTime)*.001);
-
-                float currVel = (float)(magDisp*invTimeStep);
-                avgVel += currVel*invArrSize;
-
+                if (currTime != lastTime) {
+                    double invTimeStep = 1 / ((currTime - lastTime) * .001);
+                    float currVel = (float) (magDisp * invTimeStep);
+                    avgVel += currVel * invArrSize;
+                }
                 float[] posAlongLine = addVec(scaleVec(normDiffVec, dotVec(subVec(currPos,startPos), normDiffVec)), startPos);
 
                 float currDeviation = magVec(subVec(currPos, posAlongLine));
@@ -306,40 +315,41 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
         return res;
     }
 
+    @Override
     public String toString(){
         String res = "";
-        res += userId +',';
-        res += midStrokeArea +',';
-        res += midStrokePressure +',';
-        res += avgVel +',';
-        res += directEtoEDist +',';
-        res += lengthOfTrajectory +',';
-        res += ratiodirectEtoEDistandlengthOfTrajectory +',';
+        res += userId + ",";
+        res += midStrokeArea +",";
+        res += midStrokePressure +",";
+        res += avgVel +",";
+        res += directEtoEDist +",";
+        res += lengthOfTrajectory +",";
+        res += ratiodirectEtoEDistandlengthOfTrajectory +",";
         res += largestDeviationFromEtoELine +',';
-        //res += Float.toString(meanResultantLength) +',';
-        res += medianVelocityAtLast3pts +',';
-        res += medianAccelAtFirst5Points +',';
-        res += vel20per +',';
-        res += vel50per +',';
-        res += vel80per +',';
-        res += accel20per +',';
-        res += accel50per +',';
-        res += accel80per +',';
-        res += deviation20PercFromEtoELine +',';
-        res += deviation50PercFromEtoELine +',';
-        res += deviation80PercFromEtoELine +',';
+        //res += Float.toString(meanResultantLength) +",;
+        res += medianVelocityAtLast3pts +",";
+        res += medianAccelAtFirst5Points +",";
+        res += vel20per +",";
+        res += vel50per +",";
+        res += vel80per +",";
+        res += accel20per +",";
+        res += accel50per +",";
+        res += accel80per +",";
+        res += deviation20PercFromEtoELine +",";
+        res += deviation50PercFromEtoELine +",";
+        res += deviation80PercFromEtoELine +",";
 
-        res += dirEtoELine + ',';
-        res += avgDir + ',';
+        res += dirEtoELine + ",";
+        res += avgDir + ",";
 
-        res += startx + ',';
-        res += stopx + ',';
-        res += starty + ',';
-        res += stopy + ',';
+        res += startx + ",";
+        res += stopx + ",";
+        res += starty + ",";
+        res += stopy + ",";
 
-        res += strokeDuration + ',';
+        res += strokeDuration + ",";
 
-        res += phoneOrientation +',';
+        res += phoneOrientation +",";
         res += udlrFlag;
 
         return res;
@@ -388,7 +398,7 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
                 vel50per - sec.vel50per, vel80per - sec.vel80per, accel20per - sec.accel20per, accel50per - sec.accel50per,
                 accel80per - sec.accel80per, deviation20PercFromEtoELine - sec.deviation20PercFromEtoELine,
                 deviation50PercFromEtoELine - sec.deviation50PercFromEtoELine, deviation80PercFromEtoELine - sec.deviation80PercFromEtoELine,
-                dirEtoELine - sec.dirEtoELine,avgDir- sec.avgDir, startx - sec.startx,
+                dirEtoELine - sec.dirEtoELine,avgDir - sec.avgDir, startx - sec.startx,
                 stopx - sec.stopx, starty - sec.starty, stopy - sec.stopy, strokeDuration - sec.strokeDuration,
                 phoneOrientation - sec.phoneOrientation, udlrFlag - sec.udlrFlag);
         return newFeatureSet;

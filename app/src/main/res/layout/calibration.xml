@@ -40,5 +40,5 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView"
-        tools:text="        ^ Bunny \n\n < Cat          Dog > \n\n    V Hedgehog" />
+        tools:text="        ^ Bunny \n\n < Cat          Dog > \n\n    v Hedgehog" />
 </androidx.constraintlayout.widget.ConstraintLayout>

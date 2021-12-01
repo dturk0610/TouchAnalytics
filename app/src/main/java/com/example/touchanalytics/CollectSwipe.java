@@ -1,5 +1,6 @@
 package com.example.touchanalytics;
 
+import android.content.Intent;
 import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,13 +21,13 @@ public class CollectSwipe extends AppCompatActivity{
     ConcurrentLinkedQueue<AnalyticDataEntry> swipe;
     ConcurrentLinkedQueue<AnalyticDataEntry> fullCollect;
     int numOfSwipes = 0;
-
+    public int requiredSwipeLimit = 20;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle bundle = getIntent().getExtras();
         this.manager = bundle.getParcelable("manager");
-        setContentView(R.layout.confirm_registration);               ///////here we will set the view
+        setContentView(R.layout.calibration);               ///////here we will set the view -----------
         swipe = new ConcurrentLinkedQueue<>();
         fullCollect = new ConcurrentLinkedQueue<>();
         ImageView imgView = findViewById(R.id.idIVcourse2);
@@ -56,18 +57,28 @@ public class CollectSwipe extends AppCompatActivity{
             case MotionEvent.ACTION_UP:
                 //Log.d("", "Event up");
                 AnalyticDataEntry upData = new AnalyticDataEntry(userID, this, event);
-                swipe.add(upData);
-                fullCollect.add(upData);
-                numOfSwipes += 1;
-                AnalyticDataEntry[] swipeArr = new AnalyticDataEntry[swipe.size()];
-                swipe.toArray(swipeArr);
-                swipe.clear();
-                AnalyticDataFeatureSet feature = new AnalyticDataFeatureSet(swipeArr);
-                Log.d("", "feature:" + feature.toDebugString());
-                if (numOfSwipes >= 20){
-                    OpenSaveCSV.WriteToCSV(this, fullCollect);
-                    numOfSwipes = 0;
-                    fullCollect = new ConcurrentLinkedQueue<>();
+                if (swipe.size() + 1 >= 6) {
+                    swipe.add(upData);
+                    fullCollect.add(upData);
+                    numOfSwipes += 1;
+                    AnalyticDataEntry[] swipeArr = new AnalyticDataEntry[swipe.size()];
+                    swipe.toArray(swipeArr);
+                    swipe.clear();
+                    AnalyticDataFeatureSet feature = new AnalyticDataFeatureSet(swipeArr);
+                    Log.d("", "feature:" + feature.toDebugString());
+                    if (numOfSwipes >= requiredSwipeLimit) {
+
+                        Intent confirmIntent = new Intent(this, CalibrateUser.class);
+                        CalibrateUser.fullCollect = fullCollect;
+                        startActivity(confirmIntent);
+                        numOfSwipes = 0;
+                        fullCollect = new ConcurrentLinkedQueue<>();
+                        /*
+
+                        code to setup confirmation page -make function to call to do this -----------
+
+                         */
+                    }
                 }
                 break;
         }

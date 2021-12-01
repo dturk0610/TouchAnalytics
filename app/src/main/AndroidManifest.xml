@@ -19,6 +19,7 @@
         </activity>
         <activity android:name=".OpenSaveCSV"></activity>
         <activity android:name=".CollectSwipe"></activity>
+        <activity android:name=".CalibrateUser"></activity>
 
     </application>
 

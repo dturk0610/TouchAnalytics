@@ -9,6 +9,8 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.View;
+import android.widget.Button;
 
 import java.io.File;
 import java.security.AllPermission;
@@ -54,11 +56,20 @@ public class MainActivity extends AppCompatActivity{
         dataManager = new AnalyticDataManager(this, allRegisteredUserFiles);
         Log.d("", "test 2");
 
-        Intent swipeCollect = new Intent(this, CollectSwipe.class);
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("manager", dataManager);
-        swipeCollect.putExtras(bundle);
-        startActivity(swipeCollect);
+
+        Button calibrateUSRBtn = findViewById(R.id.calibrateUSRBtn);
+
+        calibrateUSRBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent swipeCollect = new Intent(view.getContext(), CollectSwipe.class);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("manager", dataManager);
+                swipeCollect.putExtras(bundle);
+                startActivity(swipeCollect);
+            }
+        });
+
     }
 
     public static File[] CheckForRegisteredUsers(){

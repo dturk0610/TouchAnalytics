@@ -22,6 +22,7 @@ public class AnalyticDataManager implements Parcelable {
     public int[] usersCSVs;
     public File[] usersCSVFiles;
     public long userID;
+    public Float currUserMedDist;
     public ArrayList<AnalyticDataFeatureSet> featuresOfCurrentUser;
     AnalyticDataFeatureSet runningUserUpAverage; int numUpSwipes = 0;
     AnalyticDataFeatureSet runningUserDownAverage; int numDownSwipes = 0;
@@ -346,11 +347,98 @@ public class AnalyticDataManager implements Parcelable {
             dists.toArray(distances);
             Arrays.sort(distances);
             float medDist = distances[distances.length/2];
+            currUserMedDist = medDist;
             Log.d("", "medDist: " + medDist);
             Log.d("", "largeDist: " + largestDist);
             Log.d("", "smallDist: " + smallDist);
         }catch (Exception e){
             e.printStackTrace();
+        }
+    }
+
+    public boolean compareAgainstCurrent(ArrayList<AnalyticDataEntry> testSwipe){
+        try {
+            InputStream inStream = new FileInputStream(usersCSVFiles[selectedUserIndex]);
+            BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
+            String currentLine;
+            ArrayList<AnalyticDataEntry> swipe = new ArrayList<AnalyticDataEntry>();
+            ArrayList<Float> dists = new ArrayList<Float>();
+            float largestDist = Float.MIN_VALUE;
+            float smallDist = Float.MAX_VALUE;
+
+            while ((currentLine = br.readLine()) != null) {
+                //From CSV:
+                //{0}'phone ID',{1}'user ID',{2}'document ID',{3}'time[ms]',{4}'action'
+                //{5}'phone orientation',{6}'x-coordinate',{7}'y-coordinate',{8}'pressure'
+                //{9}'area covered',{10}'finger orientation'.
+                //What we are using:
+                //L{0}'userID',L{1}'eventTime[ms]',I{2}'action',I{3}'phoneOrientation'
+                //F{4}'xcoord',F{5}'ycoord',F{6}'pressure',F{7}'area covered'
+                String[] dataRowVals = currentLine.split(",");
+
+                //the index passed in here will be from the first list above
+                long userId = Long.parseLong(dataRowVals[0]);
+                long eventTime = Long.parseLong(dataRowVals[1]);
+                int action = Integer.parseInt(dataRowVals[2]);
+                int phoneOrientation = Integer.parseInt(dataRowVals[3]);
+                float xCoord = Float.parseFloat(dataRowVals[4]);
+                float yCoord = Float.parseFloat(dataRowVals[5]);
+                float pressure = Float.parseFloat(dataRowVals[6]);
+                float size = Float.parseFloat(dataRowVals[7]);
+                if (action == MotionEvent.ACTION_DOWN) {
+                    swipe = new ArrayList<AnalyticDataEntry>();
+                }
+                AnalyticDataEntry dataEntry = new AnalyticDataEntry(userId, eventTime, action,
+                        phoneOrientation, xCoord, yCoord, pressure, size);
+                swipe.add(dataEntry);
+
+                if (action == MotionEvent.ACTION_UP) {
+                    if (swipe.size() > 6) {
+                        AnalyticDataEntry[] swipeArray = new AnalyticDataEntry[swipe.size()];
+                        swipe.toArray(swipeArray);
+                        AnalyticDataFeatureSet featureSet = new AnalyticDataFeatureSet(swipeArray);
+                        float distFromAvg = 0;
+                        switch (featureSet.udlrFlag) {
+                            case 0:
+                                distFromAvg = kNN.weightedDist(runningUserUpAverage, featureSet);
+                                break;
+                            case 1:
+                                distFromAvg = kNN.weightedDist(runningUserDownAverage, featureSet);
+                                break;
+                            case 2:
+                                distFromAvg = kNN.weightedDist(runningUserLeftAverage, featureSet);
+                                break;
+                            case 3:
+                                distFromAvg = kNN.weightedDist(runningUserRightAverage, featureSet);
+                                break;
+                        }
+                        dists.add(distFromAvg);
+                        if (distFromAvg > largestDist) {
+                            //Log.d("", "largest: " + Float.toString(distFromAvg));
+                            largestDist = distFromAvg;
+                        }
+                        if (distFromAvg < smallDist) {
+                            //Log.d("", "smallest: " + Float.toString(distFromAvg));
+                            smallDist = distFromAvg;
+                        }
+                    }
+                }
+            }
+            Float[] distances = new Float[dists.size()];
+            dists.toArray(distances);
+            Arrays.sort(distances);
+            float medDist = distances[distances.length/2];
+            Log.d("", "smallDistFromTestedUSR: " + smallDist);
+            Log.d("", "largeDistFromTestedUSR: " + largestDist);
+            Log.d("", "medianDistFromTestedUSR: " + medDist);
+            Log.d("", "small dist from usr med: " + (currUserMedDist - smallDist));
+            Log.d("", "large dist from usr med: " + (currUserMedDist - largestDist));
+            Log.d("", "med dist from usr med: " + (currUserMedDist - medDist));
+            return true;
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+
         }
     }
 

@@ -75,6 +75,7 @@ public class OpenSaveCSV extends AppCompatActivity {
     }
 
     public static boolean WriteToCSV(Context context, ConcurrentLinkedQueue<AnalyticDataEntry> collectionOfSwipes){
+        Log.d("", "Attempting to save swipe collect");
         File DCIMDir = context.getExternalFilesDir(Environment.DIRECTORY_DCIM);
         File dataDCIMDir = new File(DCIMDir, "data");
         if (!dataDCIMDir.exists()){

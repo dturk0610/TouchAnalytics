@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity{
     static File registeredUserSaveDir;
     File[] allRegisteredUserFiles;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,12 +76,21 @@ public class MainActivity extends AppCompatActivity{
                 startActivity(swipeCollect);
             }
         });
+
+
+        int size = 150;
         GridLayout gridLayout = findViewById(R.id.idGrid);
+
        for(int i=0; i<5; i++) {
            Button btn = new Button(this);
+           GridLayout.LayoutParams layoutParams=new GridLayout.LayoutParams();
+           layoutParams.setMargins(size*20/100,size*20/100,size*20/100,size*20/100);
+           layoutParams.width=size;
+           layoutParams.height=size;
            btn.setTag(""+i);
            btn.setBackground(getResources().getDrawable(R.drawable.round_button));
            btn.setLayoutParams(new GridLayout.LayoutParams(calibrateUSRBtn.getLayoutParams()));
+
            gridLayout.addView(btn);
        }
     }

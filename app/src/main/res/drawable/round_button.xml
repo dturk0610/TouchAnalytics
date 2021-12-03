@@ -2,11 +2,13 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="false">
         <shape android:shape="oval">
-            <corners android:radius="20dp"
-                android:topLeftRadius="20dp"
-                android:bottomLeftRadius="10dp"
-                android:bottomRightRadius="10dp"
-                android:topRightRadius="20dp" />
+            <corners android:radius="300dp"
+                android:topLeftRadius="300dp"
+                android:bottomLeftRadius="300dp"
+                android:bottomRightRadius="300dp"
+                android:topRightRadius="300dp"
+
+                />
 
             <solid android:color="#fa814c" />
         </shape>

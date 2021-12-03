@@ -10,7 +10,9 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.GridLayout;
 
 import java.io.File;
 import java.security.AllPermission;
@@ -38,6 +40,8 @@ public class MainActivity extends AppCompatActivity{
         allRegisteredUserFiles = CheckForRegisteredUsers();
         Log.d("", "allRegisteredUserFiles length: " + allRegisteredUserFiles.length);
         setContentView(R.layout.activity_main);
+
+
         //Intent openCSV = new Intent(this, OpenSaveCSV.class);
         //startActivity(openCSV);
         CSVIds = new int[]{
@@ -59,6 +63,8 @@ public class MainActivity extends AppCompatActivity{
 
         Button calibrateUSRBtn = findViewById(R.id.calibrateUSRBtn);
 
+
+
         calibrateUSRBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -69,7 +75,14 @@ public class MainActivity extends AppCompatActivity{
                 startActivity(swipeCollect);
             }
         });
-
+        GridLayout gridLayout = findViewById(R.id.idGrid);
+       for(int i=0; i<5; i++) {
+           Button btn = new Button(this);
+           btn.setTag(""+i);
+           btn.setBackground(getResources().getDrawable(R.drawable.round_button));
+           btn.setLayoutParams(new GridLayout.LayoutParams(calibrateUSRBtn.getLayoutParams()));
+           gridLayout.addView(btn);
+       }
     }
 
     public static File[] CheckForRegisteredUsers(){

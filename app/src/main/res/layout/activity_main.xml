@@ -6,17 +6,45 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <GridView
+    <GridLayout
         android:id="@+id/idGrid"
         android:layout_width="406dp"
         android:layout_height="619dp"
         android:layout_marginBottom="108dp"
         android:horizontalSpacing="6dp"
-        android:numColumns="3"
+        android:columnCount="3"
         android:verticalSpacing="6dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent">
+    <Button
+        android:id="@+id/UsrButton1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button"
+        android:background="@drawable/round_button"/>
+        <Button
+            android:id="@+id/UsrButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Button"
+            android:background="@drawable/round_button"/>
+        <Button
+            android:id="@+id/UsrButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Button"
+            android:background="@drawable/round_button"/>
+        <Button
+            android:id="@+id/UsrButton1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Button"
+            android:background="@drawable/round_button"/>
+
+
+
+    </GridLayout>
 
     <Button
         android:id="@+id/calibrateUSRBtn"
@@ -26,6 +54,7 @@
         android:layout_marginBottom="16dp"
         android:text="Button"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/round_button"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -96,8 +96,19 @@ public class MainActivity extends AppCompatActivity{
            layoutParams.setMargins(padding, padding, padding, padding);
            btn.setBackground(getResources().getDrawable(R.drawable.round_button));
            btn.setLayoutParams(layoutParams);
-           //btn.setLayoutParams(new GridLayout.LayoutParams(calibrateUSRBtn.getLayoutParams()));
            gridLayout.addView(btn);
+
+           btn.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View view) {
+                   Intent swipeCollect = new Intent(view.getContext(), TestSwipe.class);
+                   Bundle bundle = new Bundle();
+                   bundle.putParcelable("manager", dataManager);
+                   swipeCollect.putExtras(bundle);
+                   startActivity(swipeCollect);
+               }
+           });
+
        }
     }
 

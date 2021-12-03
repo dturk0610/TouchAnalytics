@@ -38,13 +38,17 @@
         android:id="@+id/textView2"
         android:layout_width="292dp"
         android:layout_height="68dp"
+        android:layout_gravity="fill"
+        android:gravity="center"
+        android:text="Would you like to confirm\nyour registration?"
         android:textColor="@color/black"
-        android:text="Would you like to confirm\n      your registration?"
-        android:textSize="26dp"
+        android:textSize="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.499" />
 
     <Button
         android:id="@+id/no_confirmRegistration"

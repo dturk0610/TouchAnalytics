@@ -22,6 +22,7 @@ public class CollectSwipe extends AppCompatActivity{
     ConcurrentLinkedQueue<AnalyticDataEntry> fullCollect;
     int numOfSwipes = 0;
     public int requiredSwipeLimit = 20;
+    ImageView imgView;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,7 +31,7 @@ public class CollectSwipe extends AppCompatActivity{
         setContentView(R.layout.calibration);               ///////here we will set the view -----------
         swipe = new ConcurrentLinkedQueue<>();
         fullCollect = new ConcurrentLinkedQueue<>();
-        ImageView imgView = findViewById(R.id.idIVcourse2);
+        imgView = findViewById(R.id.calibrationImgView);
         //imgView.setImageDrawable(ImageSelect.RandomImage(this));
         //Intent openCSV = new Intent(this, OpenSaveCSV.class);
         //startActivity(openCSV);
@@ -79,6 +80,7 @@ public class CollectSwipe extends AppCompatActivity{
 
                          */
                     }
+                    imgView.setImageDrawable(ImageSelect.RandomImage(this));
                 }
                 break;
         }

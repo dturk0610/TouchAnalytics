@@ -45,7 +45,7 @@ public class AnalyticDataManager implements Parcelable {
     public AnalyticDataManager(Context currentContext, File[] allUserCSVFiles){
         this.context = currentContext;
         usersCSVFiles = allUserCSVFiles;
-        selectedUserIndex = 3;
+        selectedUserIndex = 0;
         CSVParserThread = new Thread(this::parseCSVFromDCIMFiles);
         CSVParserThread.run();
     }

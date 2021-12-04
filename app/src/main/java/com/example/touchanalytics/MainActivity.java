@@ -6,6 +6,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -24,11 +25,14 @@ public class MainActivity extends AppCompatActivity{
     public static int currentNumRegUsers = 0;
     static File registeredUserSaveDir;
     File[] allRegisteredUserFiles;
-
+    DisplayMetrics display;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        display = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(display);
+        getSupportActionBar().hide();
         OpenSaveCSV.verifyStoragePermissions(this);
         File DCIMDir = this.getExternalFilesDir(Environment.DIRECTORY_DCIM);
         File dataDCIMDir = new File(DCIMDir, "data");
@@ -77,21 +81,34 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
-
-        int size = 150;
+        int size = display.widthPixels;
+        int padding = 20;
+        int btnSize = size/3 - padding*2;
         GridLayout gridLayout = findViewById(R.id.idGrid);
 
-       for(int i=0; i<5; i++) {
+       for(int i = 0; i < 10; i++) {
            Button btn = new Button(this);
-           GridLayout.LayoutParams layoutParams=new GridLayout.LayoutParams();
-           layoutParams.setMargins(size*20/100,size*20/100,size*20/100,size*20/100);
-           layoutParams.width=size;
-           layoutParams.height=size;
            btn.setTag(""+i);
+           btn.setText("Usr" + i);
+           GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
+           layoutParams.height = btnSize;
+           layoutParams.width = btnSize;
+           layoutParams.setMargins(padding, padding, padding, padding);
            btn.setBackground(getResources().getDrawable(R.drawable.round_button));
-           btn.setLayoutParams(new GridLayout.LayoutParams(calibrateUSRBtn.getLayoutParams()));
-
+           btn.setLayoutParams(layoutParams);
            gridLayout.addView(btn);
+
+           btn.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View view) {
+                   Intent swipeCollect = new Intent(view.getContext(), TestSwipe.class);
+                   Bundle bundle = new Bundle();
+                   bundle.putParcelable("manager", dataManager);
+                   swipeCollect.putExtras(bundle);
+                   startActivity(swipeCollect);
+               }
+           });
+
        }
     }
 

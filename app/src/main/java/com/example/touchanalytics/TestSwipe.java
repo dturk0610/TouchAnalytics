@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +25,8 @@ public class TestSwipe  extends AppCompatActivity {
     public int requiredSwipeLimit = 20;
 
     ImageView imageView;
+    TextView txtView;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +40,9 @@ public class TestSwipe  extends AppCompatActivity {
 
         imageView = findViewById(R.id.calibrationImgView);
         imageView.setImageDrawable(ImageSelect.RandomImage(this));
+
+
+        txtView = findViewById(R.id.swipe_amount); txtView.setText("");
     }
 
     public boolean dispatchTouchEvent( MotionEvent event ) {
@@ -73,7 +79,14 @@ public class TestSwipe  extends AppCompatActivity {
                     if (numOfSwipes >= requiredSwipeLimit) {
 
                     }
-                    imageView.setImageDrawable(ImageSelect.RandomImage(this));
+                    try {
+                        imageView.setImageDrawable(ImageSelect.RandomImage(this));
+                    }
+                    catch (Exception e) {
+                        if (e.getMessage().contains("too large")){
+                            Log.d("", "image too large try again");
+                        }
+                    }
                 }
                 break;
         }

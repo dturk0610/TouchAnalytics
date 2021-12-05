@@ -7,7 +7,9 @@ import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,6 +25,7 @@ public class CollectSwipe extends AppCompatActivity{
     int numOfSwipes = 0;
     public int requiredSwipeLimit = 20;
     ImageView imgView;
+    TextView txtView;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,6 +35,20 @@ public class CollectSwipe extends AppCompatActivity{
         swipe = new ConcurrentLinkedQueue<>();
         fullCollect = new ConcurrentLinkedQueue<>();
         imgView = findViewById(R.id.calibrationImgView);
+        txtView = findViewById(R.id.swipe_amount);
+        txtView.setText(String.format("%d/%d", 0, requiredSwipeLimit));
+
+        Button backBtn = findViewById(R.id.cancelCaliBtn);
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fullCollect.clear();
+                swipe.clear();
+                Intent backToMain = new Intent(view.getContext(), MainActivity.class);
+                startActivity(backToMain);
+            }
+        });
+
         //imgView.setImageDrawable(ImageSelect.RandomImage(this));
         //Intent openCSV = new Intent(this, OpenSaveCSV.class);
         //startActivity(openCSV);
@@ -62,6 +79,7 @@ public class CollectSwipe extends AppCompatActivity{
                     swipe.add(upData);
                     fullCollect.add(upData);
                     numOfSwipes += 1;
+                    txtView.setText(String.format("%d/%d", numOfSwipes, requiredSwipeLimit));
                     AnalyticDataEntry[] swipeArr = new AnalyticDataEntry[swipe.size()];
                     swipe.toArray(swipeArr);
                     swipe.clear();

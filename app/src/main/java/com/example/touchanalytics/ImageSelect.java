@@ -13,7 +13,7 @@ import java.lang.Math;
 
 public class ImageSelect extends AppCompatActivity {
 
-    private static int numOfImagesEach = 21;
+    private static int numOfImagesEach = 10;
     private static int numOfTypes = 4;
 
     public static int animalInt;

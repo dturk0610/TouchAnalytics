@@ -39,6 +39,7 @@ public class CollectSwipe extends AppCompatActivity{
         txtView.setText(String.format("%d/%d", 0, requiredSwipeLimit));
 
         Button backBtn = findViewById(R.id.cancelCaliBtn);
+        backBtn.setText("Cancel Calibration");
         backBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

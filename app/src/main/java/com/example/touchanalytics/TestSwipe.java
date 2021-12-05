@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -43,6 +44,19 @@ public class TestSwipe  extends AppCompatActivity {
 
 
         txtView = findViewById(R.id.swipe_amount); txtView.setText("");
+
+
+        Button backBtn = findViewById(R.id.cancelCaliBtn);
+        backBtn.setText("End test");
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                fullCollect.clear();
+                swipe.clear();
+                Intent backToMain = new Intent(view.getContext(), MainActivity.class);
+                startActivity(backToMain);
+            }
+        });
     }
 
     public boolean dispatchTouchEvent( MotionEvent event ) {
@@ -79,14 +93,7 @@ public class TestSwipe  extends AppCompatActivity {
                     if (numOfSwipes >= requiredSwipeLimit) {
 
                     }
-                    try {
-                        imageView.setImageDrawable(ImageSelect.RandomImage(this));
-                    }
-                    catch (Exception e) {
-                        if (e.getMessage().contains("too large")){
-                            Log.d("", "image too large try again");
-                        }
-                    }
+                    imageView.setImageDrawable(ImageSelect.RandomImage(this));
                 }
                 break;
         }

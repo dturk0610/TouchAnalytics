@@ -2,6 +2,11 @@ package com.example.touchanalytics;
 
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 public class kNN {
 
     static float mSAWeight = .2058f;
@@ -32,7 +37,20 @@ public class kNN {
     static float phoneOrienWeight = .0344f;
     static float udlrFlagWeight = .0097f;
 
-
+    public static AnalyticDataFeatureSet[] kNN(int k, AnalyticDataFeatureSet tester, AnalyticDataFeatureSet[] data){
+        AnalyticDataFeatureSet[] res = new AnalyticDataFeatureSet[k];
+        HashMap<Float, AnalyticDataFeatureSet> hashMap = new HashMap<Float, AnalyticDataFeatureSet>();
+        for (AnalyticDataFeatureSet featureSet : data){
+            hashMap.put(weightedDist(tester, featureSet), featureSet);
+        }
+        List<Float> dists = new ArrayList<>(hashMap.keySet());
+        Collections.sort(dists);
+        for (int i = 0; i < k; i++){
+            res[i] = hashMap.get(dists.get(i));
+            Log.d("", "dist: " + dists.get(i));
+        }
+        return res;
+    }
 
     public static float dist(AnalyticDataFeatureSet set1, AnalyticDataFeatureSet set2){
         float distance = 0;
@@ -80,34 +98,34 @@ public class kNN {
             medianAccelAtFirst5Points,vel20per,vel50per,vel80per,accel20per,accel50per,accel80per,
             deviation20PercFromEtoELine,deviation50PercFromEtoELine,deviation80PercFromEtoELine,
             dirEtoELine,avgDir,startx,stopx,starty,stopy,strokeDuration,phoneOrientation,udlrFlag*/
-        AnalyticDataFeatureSet set2mset1 = set2.subForkNN(set1);
-        distance += mSAWeight*set2mset1.midStrokeArea*set2mset1.midStrokeArea;                                          // Log.d("", "dist. aft. midStrokeArea: " + distance);
-        distance += mSPWeight*set2mset1.midStrokePressure*set2mset1.midStrokePressure;                                  // Log.d("", "dist. aft. midStrokePressure: " + distance);
-        distance += avgVelWeight*set2mset1.avgVel*set2mset1.avgVel;                                                     // Log.d("", "dist. aft. avgVel: " + distance);
-        distance += dirEtoEDistWeight*set2mset1.directEtoEDist*set2mset1.directEtoEDist;                                // Log.d("", "dist. aft. directEtoEDist: " + distance);
-        distance += lnTrajWeight*set2mset1.lengthOfTrajectory*set2mset1.lengthOfTrajectory;                             // Log.d("", "dist. aft. lengthOfTrajectory: " + distance);
-        distance += ratioWeight*set2mset1.ratiodirectEtoEDistandlengthOfTrajectory;                                     // Log.d("", "dist. aft. ratiodirectEtoEDistandlengthOfTrajectory: " + distance);
-        distance += largeDevWeight*set2mset1.largestDeviationFromEtoELine*set2mset1.largestDeviationFromEtoELine;       // Log.d("", "dist. aft. largestDeviationFromEtoELine: " + distance);
-        distance += medVelLast3Weight*set2mset1.medianVelocityAtLast3pts*set2mset1.medianVelocityAtLast3pts;            // Log.d("", "dist. aft. medianVelocityAtLast3pts: " + distance);
-        distance += medAccelFirst5Weight*set2mset1.medianAccelAtFirst5Points*set2mset1.medianAccelAtFirst5Points;       // Log.d("", "dist. aft. medianAccelAtFirst5Points: " + distance);
-        distance += vel20PerWeight*set2mset1.vel20per*set2mset1.vel20per;                                               // Log.d("", "dist. aft. vel20per: " + distance);
-        distance += vel50PerWeight*set2mset1.vel50per*set2mset1.vel50per;                                               // Log.d("", "dist. aft. vel50per: " + distance);
-        distance += vel80PerWeight*set2mset1.vel80per*set2mset1.vel80per;                                               // Log.d("", "dist. aft. vel80per: " + distance);
-        distance += accel20PerWeight*set2mset1.accel20per*set2mset1.accel20per;                                         // Log.d("", "dist. aft. accel20per: " + distance);
-        distance += accel50PerWeight*set2mset1.accel50per*set2mset1.accel50per;                                         // Log.d("", "dist. aft. accel50per: " + distance);
-        distance += accel80PerWeight*set2mset1.accel80per*set2mset1.accel80per;                                         // Log.d("", "dist. aft. accel80per: " + distance);
-        distance += dev20PerWeight*set2mset1.deviation20PercFromEtoELine*set2mset1.deviation20PercFromEtoELine;         // Log.d("", "dist. aft. deviation20PercFromEtoELine: " + distance);
-        distance += dev50PerWeight*set2mset1.deviation50PercFromEtoELine*set2mset1.deviation50PercFromEtoELine;         // Log.d("", "dist. aft. deviation50PercFromEtoELine: " + distance);
-        distance += dev80PerWeight*set2mset1.deviation80PercFromEtoELine*set2mset1.deviation80PercFromEtoELine;         // Log.d("", "dist. aft. deviation80PercFromEtoELine: " + distance);
-        distance += dirEtoEWeight*set2mset1.dirEtoELine*set2mset1.dirEtoELine;                                          // Log.d("", "dist. aft. dirEtoELine: " + distance);
-        distance += avgDirWeight*set2mset1.avgDir*set2mset1.avgDir;                                                     // Log.d("", "dist. aft. avgDir: " + distance);
-        distance += startxWeight*set2mset1.startx*set2mset1.startx;                                                     // Log.d("", "dist. aft. startx: " + distance);
-        distance += stopxWeight*set2mset1.stopx*set2mset1.stopx;                                                        // Log.d("", "dist. aft. stopx: " + distance);
-        distance += startyWeight*set2mset1.starty*set2mset1.starty;                                                     // Log.d("", "dist. aft. starty: " + distance);
-        distance += stopyWeight*set2mset1.stopy*set2mset1.stopy;                                                        // Log.d("", "dist. aft. stopy: " + distance);
-        distance += strokeDurWeight*set2mset1.strokeDuration*set2mset1.strokeDuration;                                  // Log.d("", "dist. aft. strokeDuration: " + distance);
-        distance += phoneOrienWeight*set2mset1.phoneOrientation*set2mset1.phoneOrientation;                             // Log.d("", "dist. aft. phoneOrientation: " + distance);
-        distance += udlrFlagWeight*set2mset1.udlrFlag*set2mset1.udlrFlag;                                               // Log.d("", "dist. aft. udlrFlag: " + distance);
+        AnalyticDataFeatureSet set1mset2 = set1.subForkNN(set2);
+        distance += mSAWeight*set1mset2.midStrokeArea*set1mset2.midStrokeArea;                                          // Log.d("", "dist. aft. midStrokeArea: " + distance);
+        distance += mSPWeight*set1mset2.midStrokePressure*set1mset2.midStrokePressure;                                  // Log.d("", "dist. aft. midStrokePressure: " + distance);
+        distance += avgVelWeight*set1mset2.avgVel*set1mset2.avgVel;                                                     // Log.d("", "dist. aft. avgVel: " + distance);
+        distance += dirEtoEDistWeight*set1mset2.directEtoEDist*set1mset2.directEtoEDist;                                // Log.d("", "dist. aft. directEtoEDist: " + distance);
+        distance += lnTrajWeight*set1mset2.lengthOfTrajectory*set1mset2.lengthOfTrajectory;                             // Log.d("", "dist. aft. lengthOfTrajectory: " + distance);
+        distance += ratioWeight*set1mset2.ratiodirectEtoEDistandlengthOfTrajectory;                                     // Log.d("", "dist. aft. ratiodirectEtoEDistandlengthOfTrajectory: " + distance);
+        distance += largeDevWeight*set1mset2.largestDeviationFromEtoELine*set1mset2.largestDeviationFromEtoELine;       // Log.d("", "dist. aft. largestDeviationFromEtoELine: " + distance);
+        distance += medVelLast3Weight*set1mset2.medianVelocityAtLast3pts*set1mset2.medianVelocityAtLast3pts;            // Log.d("", "dist. aft. medianVelocityAtLast3pts: " + distance);
+        distance += medAccelFirst5Weight*set1mset2.medianAccelAtFirst5Points*set1mset2.medianAccelAtFirst5Points;       // Log.d("", "dist. aft. medianAccelAtFirst5Points: " + distance);
+        distance += vel20PerWeight*set1mset2.vel20per*set1mset2.vel20per;                                               // Log.d("", "dist. aft. vel20per: " + distance);
+        distance += vel50PerWeight*set1mset2.vel50per*set1mset2.vel50per;                                               // Log.d("", "dist. aft. vel50per: " + distance);
+        distance += vel80PerWeight*set1mset2.vel80per*set1mset2.vel80per;                                               // Log.d("", "dist. aft. vel80per: " + distance);
+        distance += accel20PerWeight*set1mset2.accel20per*set1mset2.accel20per;                                         // Log.d("", "dist. aft. accel20per: " + distance);
+        distance += accel50PerWeight*set1mset2.accel50per*set1mset2.accel50per;                                         // Log.d("", "dist. aft. accel50per: " + distance);
+        distance += accel80PerWeight*set1mset2.accel80per*set1mset2.accel80per;                                         // Log.d("", "dist. aft. accel80per: " + distance);
+        distance += dev20PerWeight*set1mset2.deviation20PercFromEtoELine*set1mset2.deviation20PercFromEtoELine;         // Log.d("", "dist. aft. deviation20PercFromEtoELine: " + distance);
+        distance += dev50PerWeight*set1mset2.deviation50PercFromEtoELine*set1mset2.deviation50PercFromEtoELine;         // Log.d("", "dist. aft. deviation50PercFromEtoELine: " + distance);
+        distance += dev80PerWeight*set1mset2.deviation80PercFromEtoELine*set1mset2.deviation80PercFromEtoELine;         // Log.d("", "dist. aft. deviation80PercFromEtoELine: " + distance);
+        distance += dirEtoEWeight*set1mset2.dirEtoELine*set1mset2.dirEtoELine;                                          // Log.d("", "dist. aft. dirEtoELine: " + distance);
+        distance += avgDirWeight*set1mset2.avgDir*set1mset2.avgDir;                                                     // Log.d("", "dist. aft. avgDir: " + distance);
+        distance += startxWeight*set1mset2.startx*set1mset2.startx;                                                     // Log.d("", "dist. aft. startx: " + distance);
+        distance += stopxWeight*set1mset2.stopx*set1mset2.stopx;                                                        // Log.d("", "dist. aft. stopx: " + distance);
+        distance += startyWeight*set1mset2.starty*set1mset2.starty;                                                     // Log.d("", "dist. aft. starty: " + distance);
+        distance += stopyWeight*set1mset2.stopy*set1mset2.stopy;                                                        // Log.d("", "dist. aft. stopy: " + distance);
+        distance += strokeDurWeight*set1mset2.strokeDuration*set1mset2.strokeDuration;                                  // Log.d("", "dist. aft. strokeDuration: " + distance);
+        distance += phoneOrienWeight*set1mset2.phoneOrientation*set1mset2.phoneOrientation;                             // Log.d("", "dist. aft. phoneOrientation: " + distance);
+        distance += udlrFlagWeight*set1mset2.udlrFlag*set1mset2.udlrFlag;                                               // Log.d("", "dist. aft. udlrFlag: " + distance);
 
 
         return (float)Math.sqrt(distance);

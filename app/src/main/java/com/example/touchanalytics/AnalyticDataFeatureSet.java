@@ -1,12 +1,14 @@
 package com.example.touchanalytics;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.example.touchanalytics.AnalyticDataEntry;
 
-public class AnalyticDataFeatureSet implements java.io.Serializable{
+public class AnalyticDataFeatureSet implements java.io.Serializable , Parcelable {
     /*
      * 20.58%    mid-stroke area covered
      * 19.63%    20%-perc. pairwise velocity
@@ -40,7 +42,7 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
      * 0.97%     up/down/left/right flag
      * 0%        change of finger orientation
      * */
-    long userId;                                                    /*done*/
+    String userId;                                                  /*done*/
     float midStrokeArea;                                            /*done*/
     float midStrokePressure;                                        /*done*/
     float avgVel;                                                   /*done*/
@@ -68,7 +70,7 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
 
     float[] u = {0, -1}, d = {0, 1}, l = {-1, 0}, r = {1, 0};
 
-    public AnalyticDataFeatureSet (long userId, float midStrokeArea, float midStrokePressure,
+    public AnalyticDataFeatureSet (String userId, float midStrokeArea, float midStrokePressure,
             float avgVel, float directEtoEDist, float lengthOfTrajectory, float ratiodirectEtoEDistandlengthOfTrajectory,
             float largestDeviationFromEtoELine, float medianVelocityAtLast3pts, float medianAccelAtFirst5Points,
             float vel20per, float vel50per, float vel80per, float accel20per, float accel50per, float accel80per,
@@ -104,6 +106,7 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
         this.phoneOrientation = phoneOrientation;
         this.udlrFlag = udlrFlag;
     }
+
     public AnalyticDataFeatureSet(AnalyticDataEntry[] swipe){
         try {
             if (swipe.length < 6) { //6 is not arbitrary, one of the functions requires the last 5 points
@@ -278,6 +281,53 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
         }
     }
 
+    protected AnalyticDataFeatureSet(Parcel in) {
+        userId = in.readString();
+        midStrokeArea = in.readFloat();
+        midStrokePressure = in.readFloat();
+        avgVel = in.readFloat();
+        directEtoEDist = in.readFloat();
+        lengthOfTrajectory = in.readFloat();
+        ratiodirectEtoEDistandlengthOfTrajectory = in.readFloat();
+        largestDeviationFromEtoELine = in.readFloat();
+        medianVelocityAtLast3pts = in.readFloat();
+        medianAccelAtFirst5Points = in.readFloat();
+        vel20per = in.readFloat();
+        vel50per = in.readFloat();
+        vel80per = in.readFloat();
+        accel20per = in.readFloat();
+        accel50per = in.readFloat();
+        accel80per = in.readFloat();
+        deviation20PercFromEtoELine = in.readFloat();
+        deviation50PercFromEtoELine = in.readFloat();
+        deviation80PercFromEtoELine = in.readFloat();
+        dirEtoELine = in.readFloat();
+        avgDir = in.readFloat();
+        startx = in.readFloat();
+        stopx = in.readFloat();
+        starty = in.readFloat();
+        stopy = in.readFloat();
+        strokeDuration = in.readLong();
+        phoneOrientation = in.readInt();
+        udlrFlag = in.readInt();
+        u = in.createFloatArray();
+        d = in.createFloatArray();
+        l = in.createFloatArray();
+        r = in.createFloatArray();
+    }
+
+    public static final Creator<AnalyticDataFeatureSet> CREATOR = new Creator<AnalyticDataFeatureSet>() {
+        @Override
+        public AnalyticDataFeatureSet createFromParcel(Parcel in) {
+            return new AnalyticDataFeatureSet(in);
+        }
+
+        @Override
+        public AnalyticDataFeatureSet[] newArray(int size) {
+            return new AnalyticDataFeatureSet[size];
+        }
+    };
+
     public String toDebugString(){
         String res = "";
         res += "userId: " + userId + "\n";
@@ -359,15 +409,19 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
 
     public AnalyticDataFeatureSet add(AnalyticDataFeatureSet sec){
         AnalyticDataFeatureSet newFeatureSet;
-        if (this.userId != sec.userId){
-            return null;
-        }else {
+        String addedID;
+        if (this.userId != sec.userId)
+            addedID = userId + "+" + sec.userId;
+        else
+            addedID = userId;
+
+
             /*userId,midStrokeArea,midStrokePressure,avgVel,directEtoEDist,lengthOfTrajectory,
             ratiodirectEtoEDistandlengthOfTrajectory,largestDeviationFromEtoELine,medianVelocityAtLast3pts,
             medianAccelAtFirst5Points,vel20per,vel50per,vel80per,accel20per,accel50per,accel80per,
             deviation20PercFromEtoELine,deviation50PercFromEtoELine,deviation80PercFromEtoELine,
             dirEtoELine,avgDir,startx,stopx,starty,stopy,strokeDuration,phoneOrientation,udlrFlag*/
-            newFeatureSet = new AnalyticDataFeatureSet(userId, midStrokeArea + sec.midStrokeArea,
+            newFeatureSet = new AnalyticDataFeatureSet(addedID, midStrokeArea + sec.midStrokeArea,
                     midStrokePressure + sec.midStrokePressure, avgVel + sec.avgVel, directEtoEDist + sec.directEtoEDist,
                     lengthOfTrajectory + sec.lengthOfTrajectory,
                     ratiodirectEtoEDistandlengthOfTrajectory + sec.ratiodirectEtoEDistandlengthOfTrajectory,
@@ -381,7 +435,7 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
                     phoneOrientation + sec.phoneOrientation, udlrFlag + sec.udlrFlag);
 
             return newFeatureSet;
-        }
+        //}
     }
 
     public AnalyticDataFeatureSet subForkNN(AnalyticDataFeatureSet sec){
@@ -391,7 +445,7 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
             medianAccelAtFirst5Points,vel20per,vel50per,vel80per,accel20per,accel50per,accel80per,
             deviation20PercFromEtoELine,deviation50PercFromEtoELine,deviation80PercFromEtoELine,
             dirEtoELine,avgDir,startx,stopx,starty,stopy,strokeDuration,phoneOrientation,udlrFlag*/
-        newFeatureSet = new AnalyticDataFeatureSet(-1, midStrokeArea - sec.midStrokeArea,
+        newFeatureSet = new AnalyticDataFeatureSet( "", midStrokeArea - sec.midStrokeArea,
                 midStrokePressure - sec.midStrokePressure, avgVel - sec.avgVel, directEtoEDist - sec.directEtoEDist,
                 lengthOfTrajectory - sec.lengthOfTrajectory,
                 ratiodirectEtoEDistandlengthOfTrajectory - sec.ratiodirectEtoEDistandlengthOfTrajectory,
@@ -430,5 +484,46 @@ public class AnalyticDataFeatureSet implements java.io.Serializable{
     private float[] normVec(float[] v) {
         float invmag = 1/magVec(v);
         return new float[]{v[0]*invmag, v[1]*invmag};
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(userId);
+        parcel.writeFloat(midStrokeArea);
+        parcel.writeFloat(midStrokePressure);
+        parcel.writeFloat(avgVel);
+        parcel.writeFloat(directEtoEDist);
+        parcel.writeFloat(lengthOfTrajectory);
+        parcel.writeFloat(ratiodirectEtoEDistandlengthOfTrajectory);
+        parcel.writeFloat(largestDeviationFromEtoELine);
+        parcel.writeFloat(medianVelocityAtLast3pts);
+        parcel.writeFloat(medianAccelAtFirst5Points);
+        parcel.writeFloat(vel20per);
+        parcel.writeFloat(vel50per);
+        parcel.writeFloat(vel80per);
+        parcel.writeFloat(accel20per);
+        parcel.writeFloat(accel50per);
+        parcel.writeFloat(accel80per);
+        parcel.writeFloat(deviation20PercFromEtoELine);
+        parcel.writeFloat(deviation50PercFromEtoELine);
+        parcel.writeFloat(deviation80PercFromEtoELine);
+        parcel.writeFloat(dirEtoELine);
+        parcel.writeFloat(avgDir);
+        parcel.writeFloat(startx);
+        parcel.writeFloat(stopx);
+        parcel.writeFloat(starty);
+        parcel.writeFloat(stopy);
+        parcel.writeLong(strokeDuration);
+        parcel.writeInt(phoneOrientation);
+        parcel.writeInt(udlrFlag);
+        parcel.writeFloatArray(u);
+        parcel.writeFloatArray(d);
+        parcel.writeFloatArray(l);
+        parcel.writeFloatArray(r);
     }
 }

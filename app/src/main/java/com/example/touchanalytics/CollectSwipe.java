@@ -40,7 +40,7 @@ public class CollectSwipe extends AppCompatActivity{
     public boolean dispatchTouchEvent( MotionEvent event ) {
         // Log.w( MA, "Inside onTouchEvent" );
         View v = getCurrentFocus();
-        long userID = manager.userID;
+        String userID = manager.userID;
         switch (event.getAction()){
             case MotionEvent.ACTION_DOWN:
                 //Log.d("", "Event down");

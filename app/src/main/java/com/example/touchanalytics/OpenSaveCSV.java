@@ -99,7 +99,7 @@ public class OpenSaveCSV extends AppCompatActivity {
 
         try (FileOutputStream fOS = new FileOutputStream(newUserFile.toString())){
             while ((dataEntry = collectionOfSwipes.poll()) != null){
-                dataEntry.userId = count;
+                dataEntry.userId = "" + count;
                 String line = dataEntry + "\n";
                 fOS.write(line.getBytes());
             }

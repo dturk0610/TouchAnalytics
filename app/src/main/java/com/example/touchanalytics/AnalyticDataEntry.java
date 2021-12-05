@@ -45,7 +45,7 @@ public class AnalyticDataEntry implements java.io.Serializable {
 
     /* [userId,eventTime,action,phoneOrientation,xCoord,yCoord,pressure,size] */
 
-    public long userId;
+    public String userId;
 
     //Get the below values using the MotionEvent.obtain method
     public long eventTime;
@@ -56,7 +56,7 @@ public class AnalyticDataEntry implements java.io.Serializable {
     public float pressure;
     public float size; //the area of which the finger takes up on the screen
 
-    public AnalyticDataEntry(long userId, long eventTime, int action, int phoneOrientation, float xCoord, float yCoord, float pressure, float size) {
+    public AnalyticDataEntry(String userId, long eventTime, int action, int phoneOrientation, float xCoord, float yCoord, float pressure, float size) {
         this.userId = userId;
         this.eventTime = eventTime;
         this.action = action;
@@ -67,7 +67,7 @@ public class AnalyticDataEntry implements java.io.Serializable {
         this.size = size;
     }
 
-    public AnalyticDataEntry(long userId, long eventTime, int action, Activity activity, float xCoord, float yCoord, float pressure, float size) {
+    public AnalyticDataEntry(String userId, long eventTime, int action, Activity activity, float xCoord, float yCoord, float pressure, float size) {
         this.userId = userId;
         this.eventTime = eventTime;
         this.action = action;
@@ -78,7 +78,7 @@ public class AnalyticDataEntry implements java.io.Serializable {
         this.size = size;
     }
 
-    public AnalyticDataEntry(long userId, Activity activity, MotionEvent moEv) {
+    public AnalyticDataEntry(String userId, Activity activity, MotionEvent moEv) {
         this.userId = userId;
         this.eventTime = moEv.getEventTime();
         this.action = moEv.getAction();

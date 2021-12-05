@@ -86,10 +86,13 @@ public class MainActivity extends AppCompatActivity{
         int btnSize = size/3 - padding*2;
         GridLayout gridLayout = findViewById(R.id.idGrid);
 
-       for(int i = 0; i < 10; i++) {
+       for(int i = 0; i < currentNumRegUsers; i++) {
            Button btn = new Button(this);
-           btn.setTag(""+i);
-           btn.setText("Usr" + i);
+           String fileNameWEXT = allRegisteredUserFiles[i].getName();
+           String usrTag = fileNameWEXT.substring(0, fileNameWEXT.indexOf('.'));
+           Log.d("", usrTag);
+           btn.setTag(usrTag);
+           btn.setText(usrTag);
            GridLayout.LayoutParams layoutParams = new GridLayout.LayoutParams();
            layoutParams.height = btnSize;
            layoutParams.width = btnSize;
@@ -98,14 +101,16 @@ public class MainActivity extends AppCompatActivity{
            btn.setLayoutParams(layoutParams);
            gridLayout.addView(btn);
 
+           int finalI = i;
            btn.setOnClickListener(new View.OnClickListener() {
                @Override
                public void onClick(View view) {
-                   Intent swipeCollect = new Intent(view.getContext(), TestSwipe.class);
+                   Intent testSwipe = new Intent(view.getContext(), TestSwipe.class);
                    Bundle bundle = new Bundle();
-                   bundle.putParcelable("manager", dataManager);
-                   swipeCollect.putExtras(bundle);
-                   startActivity(swipeCollect);
+                   dataManager.selectedUserIndex = finalI;
+                   bundle.putParcelable("dataManager", dataManager);
+                   testSwipe.putExtras(bundle);
+                   startActivity(testSwipe);
                }
            });
 

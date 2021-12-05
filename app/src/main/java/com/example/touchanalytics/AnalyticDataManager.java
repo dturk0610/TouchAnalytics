@@ -21,7 +21,7 @@ public class AnalyticDataManager implements Parcelable {
     public int selectedUserIndex;
     public int[] usersCSVs;
     public File[] usersCSVFiles;
-    public long userID;
+    public String userID;
     public Float currUserMedDist;
     public ArrayList<AnalyticDataFeatureSet> featuresOfCurrentUser;
     AnalyticDataFeatureSet runningUserUpAverage; int numUpSwipes = 0;
@@ -50,11 +50,27 @@ public class AnalyticDataManager implements Parcelable {
         CSVParserThread.run();
     }
 
+
     protected AnalyticDataManager(Parcel in) {
         selectedUserIndex = in.readInt();
         usersCSVs = in.createIntArray();
-        userID = in.readLong();
+        userID = in.readString();
+        if (in.readByte() == 0) {
+            currUserMedDist = null;
+        } else {
+            currUserMedDist = in.readFloat();
+        }
+        featuresOfCurrentUser = in.createTypedArrayList(AnalyticDataFeatureSet.CREATOR);
+        runningUserUpAverage = in.readParcelable(AnalyticDataFeatureSet.class.getClassLoader());
+        numUpSwipes = in.readInt();
+        runningUserDownAverage = in.readParcelable(AnalyticDataFeatureSet.class.getClassLoader());
+        numDownSwipes = in.readInt();
+        runningUserLeftAverage = in.readParcelable(AnalyticDataFeatureSet.class.getClassLoader());
+        numLeftSwipes = in.readInt();
+        runningUserRightAverage = in.readParcelable(AnalyticDataFeatureSet.class.getClassLoader());
+        numRightSwipes = in.readInt();
         maxDistanceFromAverage = in.readFloat();
+        usersCSVFiles = (File[])in.readSerializable();
     }
 
     public static final Creator<AnalyticDataManager> CREATOR = new Creator<AnalyticDataManager>() {
@@ -68,6 +84,17 @@ public class AnalyticDataManager implements Parcelable {
             return new AnalyticDataManager[size];
         }
     };
+
+    public void rerunDCIMThread(){
+        Log.d("", "reRunning parser thread");
+        runningUserUpAverage = null; numUpSwipes = 0;
+        runningUserDownAverage = null; numDownSwipes = 0;
+        runningUserLeftAverage = null; numLeftSwipes = 0;
+        runningUserRightAverage = null; numRightSwipes = 0;
+        CSVParserThread = new Thread(this::parseCSVFromDCIMFiles);
+        CSVParserThread.run();
+    }
+
 
     public void parseCSVFromRaw(){
         try {
@@ -87,7 +114,7 @@ public class AnalyticDataManager implements Parcelable {
                 String[] dataRowVals = currentLine.split(",");
 
                 //the index passed in here will be from the first list above
-                long userId = Long.parseLong(dataRowVals[1]);
+                String userId = dataRowVals[1];
                 long eventTime = Long.parseLong(dataRowVals[3]);
                 int action = Integer.parseInt(dataRowVals[4]);
                 int phoneOrientation = Integer.parseInt(dataRowVals[5]);
@@ -157,7 +184,7 @@ public class AnalyticDataManager implements Parcelable {
                 String[] dataRowVals = currentLine.split(",");
 
                 //the index passed in here will be from the first list above
-                long userId = Long.parseLong(dataRowVals[1]);
+                String userId = dataRowVals[1];
                 long eventTime = Long.parseLong(dataRowVals[3]);
                 int action = Integer.parseInt(dataRowVals[4]);
                 int phoneOrientation = Integer.parseInt(dataRowVals[5]);
@@ -211,7 +238,8 @@ public class AnalyticDataManager implements Parcelable {
 
     public void parseCSVFromDCIMFiles(){
         try {
-            InputStream inStream = new FileInputStream(usersCSVFiles[selectedUserIndex]);
+            File selectedFile = usersCSVFiles[selectedUserIndex];
+            InputStream inStream = new FileInputStream(selectedFile);
 
             ArrayList<AnalyticDataEntry> swipe = new ArrayList<AnalyticDataEntry>();
             BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
@@ -228,7 +256,7 @@ public class AnalyticDataManager implements Parcelable {
                 String[] dataRowVals = currentLine.split(",");
 
                 //the index passed in here will be from the first list above
-                long userId = Long.parseLong(dataRowVals[0]);
+                String userId = dataRowVals[0];
                 long eventTime = Long.parseLong(dataRowVals[1]);
                 int action = Integer.parseInt(dataRowVals[2]);
                 int phoneOrientation = Integer.parseInt(dataRowVals[3]);
@@ -248,9 +276,11 @@ public class AnalyticDataManager implements Parcelable {
                     if (swipe.size() > 6){
                         AnalyticDataEntry[] swipeArray = new AnalyticDataEntry[swipe.size()];
                         swipe.toArray(swipeArray);
+                        swipe.clear();
                         AnalyticDataFeatureSet featureSet = new AnalyticDataFeatureSet(swipeArray);
 
                         //Log.d("", "feature:" + featureSet.toDebugString());
+
                         if (runningUserUpAverage == null && featureSet.udlrFlag == 0) {
                             runningUserUpAverage = featureSet; numUpSwipes++;
                         }else if (runningUserDownAverage == null && featureSet.udlrFlag == 1) {
@@ -277,13 +307,13 @@ public class AnalyticDataManager implements Parcelable {
 
             }
             float invSwipeCount = 1f/((float)trueSwipeCount);
-            if (numUpSwipes != 0)
+            if (numUpSwipes > 0)
                 runningUserUpAverage = runningUserUpAverage.scale(1f/((float)numUpSwipes));
-            if (numDownSwipes != 0)
+            if (numDownSwipes > 0)
                 runningUserDownAverage = runningUserDownAverage.scale(1f/((float)numDownSwipes));
-            if (numLeftSwipes != 0)
+            if (numLeftSwipes > 0)
                 runningUserLeftAverage = runningUserLeftAverage.scale(1f/((float)numLeftSwipes));
-            if (numRightSwipes != 0)
+            if (numRightSwipes > 0)
                 runningUserRightAverage = runningUserRightAverage.scale(1f/((float)numRightSwipes));
 
             ArrayList<Float> dists = new ArrayList<Float>();
@@ -303,7 +333,7 @@ public class AnalyticDataManager implements Parcelable {
                 String[] dataRowVals = currentLine.split(",");
 
                 //the index passed in here will be from the first list above
-                long userId = Long.parseLong(dataRowVals[0]);
+                String userId = dataRowVals[0];
                 long eventTime = Long.parseLong(dataRowVals[1]);
                 int action = Integer.parseInt(dataRowVals[2]);
                 int phoneOrientation = Integer.parseInt(dataRowVals[3]);
@@ -356,8 +386,10 @@ public class AnalyticDataManager implements Parcelable {
         }
     }
 
-    public boolean compareAgainstCurrent(ArrayList<AnalyticDataEntry> testSwipe){
+    public boolean compareAgainstCurrent(AnalyticDataEntry[] testSwipe){
         try {
+            if (CSVParserThread != null)
+                CSVParserThread.join();
             InputStream inStream = new FileInputStream(usersCSVFiles[selectedUserIndex]);
             BufferedReader br = new BufferedReader(new InputStreamReader(inStream));
             String currentLine;
@@ -365,7 +397,7 @@ public class AnalyticDataManager implements Parcelable {
             ArrayList<Float> dists = new ArrayList<Float>();
             float largestDist = Float.MIN_VALUE;
             float smallDist = Float.MAX_VALUE;
-
+            List<AnalyticDataFeatureSet> allFeatures = new ArrayList<>();
             while ((currentLine = br.readLine()) != null) {
                 //From CSV:
                 //{0}'phone ID',{1}'user ID',{2}'document ID',{3}'time[ms]',{4}'action'
@@ -377,7 +409,7 @@ public class AnalyticDataManager implements Parcelable {
                 String[] dataRowVals = currentLine.split(",");
 
                 //the index passed in here will be from the first list above
-                long userId = Long.parseLong(dataRowVals[0]);
+                String userId = dataRowVals[0];
                 long eventTime = Long.parseLong(dataRowVals[1]);
                 int action = Integer.parseInt(dataRowVals[2]);
                 int phoneOrientation = Integer.parseInt(dataRowVals[3]);
@@ -394,9 +426,11 @@ public class AnalyticDataManager implements Parcelable {
 
                 if (action == MotionEvent.ACTION_UP) {
                     if (swipe.size() > 6) {
-                        AnalyticDataEntry[] swipeArray = new AnalyticDataEntry[swipe.size()];
-                        swipe.toArray(swipeArray);
-                        AnalyticDataFeatureSet featureSet = new AnalyticDataFeatureSet(swipeArray);
+                        AnalyticDataEntry[] swipeArr = new AnalyticDataEntry[swipe.size()];
+                        swipe.toArray(swipeArr);
+                        AnalyticDataFeatureSet featureSet = new AnalyticDataFeatureSet(swipeArr);
+                        allFeatures.add(featureSet);
+                        /*
                         float distFromAvg = 0;
                         switch (featureSet.udlrFlag) {
                             case 0:
@@ -420,10 +454,16 @@ public class AnalyticDataManager implements Parcelable {
                         if (distFromAvg < smallDist) {
                             //Log.d("", "smallest: " + Float.toString(distFromAvg));
                             smallDist = distFromAvg;
-                        }
+                        }*/
                     }
                 }
             }
+            AnalyticDataFeatureSet testFeatureSet = new AnalyticDataFeatureSet(testSwipe);
+            AnalyticDataFeatureSet[] allFeatArr = new AnalyticDataFeatureSet[allFeatures.size()];
+            allFeatures.toArray(allFeatArr);
+            AnalyticDataFeatureSet[] closetK = kNN.kNN(5,testFeatureSet, allFeatArr);
+
+            /*
             Float[] distances = new Float[dists.size()];
             dists.toArray(distances);
             Arrays.sort(distances);
@@ -434,6 +474,8 @@ public class AnalyticDataManager implements Parcelable {
             Log.d("", "small dist from usr med: " + (currUserMedDist - smallDist));
             Log.d("", "large dist from usr med: " + (currUserMedDist - largestDist));
             Log.d("", "med dist from usr med: " + (currUserMedDist - medDist));
+
+             */
             return true;
         }catch(Exception e){
             e.printStackTrace();
@@ -442,17 +484,6 @@ public class AnalyticDataManager implements Parcelable {
         }
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeInt(selectedUserIndex);
-        parcel.writeArray(new int[][]{usersCSVs});
-        parcel.writeLong(userID);
-    }
 
     public void switchSelectedUser(int index){
         selectedUserIndex = index;
@@ -460,7 +491,7 @@ public class AnalyticDataManager implements Parcelable {
 
     //ideally this will be the entirety of one user's calibration test
     public boolean AddEntries(List<AnalyticDataEntry> usersEntries){
-        long currUserID = usersEntries.get(0).userId;
+        String currUserID = usersEntries.get(0).userId;
 
         //Makes sure that all entries being added are from the same user
         for (AnalyticDataEntry dataEntry : usersEntries){
@@ -472,5 +503,34 @@ public class AnalyticDataManager implements Parcelable {
             AllPointsOfData.add(dataEntry);
         }
         return true;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(selectedUserIndex);
+        parcel.writeIntArray(usersCSVs);
+        parcel.writeString(userID);
+        if (currUserMedDist == null) {
+            parcel.writeByte((byte) 0);
+        } else {
+            parcel.writeByte((byte) 1);
+            parcel.writeFloat(currUserMedDist);
+        }
+        parcel.writeTypedList(featuresOfCurrentUser);
+        parcel.writeParcelable(runningUserUpAverage, i);
+        parcel.writeInt(numUpSwipes);
+        parcel.writeParcelable(runningUserDownAverage, i);
+        parcel.writeInt(numDownSwipes);
+        parcel.writeParcelable(runningUserLeftAverage, i);
+        parcel.writeInt(numLeftSwipes);
+        parcel.writeParcelable(runningUserRightAverage, i);
+        parcel.writeInt(numRightSwipes);
+        parcel.writeFloat(maxDistanceFromAverage);
+        parcel.writeSerializable(usersCSVFiles);
     }
 }

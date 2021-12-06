@@ -22,7 +22,7 @@
         app:layout_constraintVertical_bias="0.139" />
 
     <ImageView
-        android:id="@+id/idIVcourse2"
+        android:id="@+id/usernameTEXT"
         android:layout_width="94dp"
         android:layout_height="93dp"
         android:layout_gravity="center"
@@ -117,5 +117,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.203" />
+
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="115dp"
+        android:layout_height="55dp"
+        android:text="username"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.054"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.403" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

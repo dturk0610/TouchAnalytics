@@ -24,24 +24,11 @@
         android:layout_height="491dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/idIVcourse3"
-        app:layout_constraintVertical_bias="0.108"
+        app:layout_constraintVertical_bias="0.187"
         app:srcCompat="@drawable/b" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="205dp"
-        android:layout_height="151dp"
-        android:text="TextView"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.108"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/calibrationImgView"
-        app:layout_constraintVertical_bias="0.63"
-        tools:text="        up Bunny \n\n left Cat          Dog right \n\n    down Hedgehog" />
 
     <Button
         android:id="@+id/cancelCaliBtn"
@@ -50,9 +37,7 @@
         android:layout_marginBottom="60dp"
         android:text="Cancel Calibration"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.642"
-        app:layout_constraintStart_toEndOf="@+id/textView" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
         android:id="@+id/swipe_amount"
@@ -62,4 +47,16 @@
         android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="217dp"
+        android:layout_height="158dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.036"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.954"
+        app:srcCompat="@drawable/directions" />
 </androidx.constraintlayout.widget.ConstraintLayout>

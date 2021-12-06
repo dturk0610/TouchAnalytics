@@ -381,6 +381,7 @@ public class AnalyticDataManager implements Parcelable {
             Log.d("", "medDist: " + medDist);
             Log.d("", "largeDist: " + largestDist);
             Log.d("", "smallDist: " + smallDist);
+            maxDistanceFromAverage = largestDist;
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -395,8 +396,6 @@ public class AnalyticDataManager implements Parcelable {
             String currentLine;
             ArrayList<AnalyticDataEntry> swipe = new ArrayList<AnalyticDataEntry>();
             ArrayList<Float> dists = new ArrayList<Float>();
-            float largestDist = Float.MIN_VALUE;
-            float smallDist = Float.MAX_VALUE;
             List<AnalyticDataFeatureSet> allFeatures = new ArrayList<>();
             while ((currentLine = br.readLine()) != null) {
                 //From CSV:
@@ -461,7 +460,14 @@ public class AnalyticDataManager implements Parcelable {
             AnalyticDataFeatureSet testFeatureSet = new AnalyticDataFeatureSet(testSwipe);
             AnalyticDataFeatureSet[] allFeatArr = new AnalyticDataFeatureSet[allFeatures.size()];
             allFeatures.toArray(allFeatArr);
-            AnalyticDataFeatureSet[] closetK = kNN.kNN(5,testFeatureSet, allFeatArr);
+            AnalyticDataFeatureSet[] closetK = kNN.kNN(5,testFeatureSet, allFeatArr); // k > 0
+            Log.d("", "LargestDistFromAvg: " + maxDistanceFromAverage);
+            float smallest = kNN.weightedDist(testFeatureSet, closetK[0]);
+            Log.d("", "SmallestDistTestFeature: " + smallest);
+            if (smallest < maxDistanceFromAverage){
+                Log.d("", "User Should be the same");
+            }
+
 
             /*
             Float[] distances = new Float[dists.size()];

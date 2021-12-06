@@ -149,11 +149,11 @@ public class AnalyticDataFeatureSet implements java.io.Serializable , Parcelable
             int per50Size = (int)(arrSize*.5f);
             int per80Size = (int)(arrSize*.8f);
 
-            double per20TimeDiff = (swipe[per20Size].eventTime - swipe[per20Size - 1].eventTime)*.001;
+            double per20TimeDiff = (swipe[per20Size].eventTime - swipe[per20Size - 1].eventTime);
             double invPer20TimeDiff = (per20TimeDiff != 0) ? 1/per20TimeDiff : 0;
-            double per50TimeDiff = (swipe[per50Size].eventTime - swipe[per50Size - 1].eventTime)*.001;
+            double per50TimeDiff = (swipe[per50Size].eventTime - swipe[per50Size - 1].eventTime);
             double invPer50TimeDiff = (per50TimeDiff !=0 ) ?  1/per50TimeDiff : 0;
-            double per80TimeDiff = (swipe[per80Size].eventTime - swipe[per80Size - 1].eventTime)*.001;
+            double per80TimeDiff = (swipe[per80Size].eventTime - swipe[per80Size - 1].eventTime);
             double invPer80TimeDiff = (per80TimeDiff !=0 ) ?  1/per80TimeDiff : 0;
 
             float pos20x = swipe[per20Size].xCoord;
@@ -200,11 +200,11 @@ public class AnalyticDataFeatureSet implements java.io.Serializable , Parcelable
             float[] pos3 = {swipe[3].xCoord, swipe[3].yCoord};
             float[] pos4 = {swipe[4].xCoord, swipe[4].yCoord};
             float[] pos5 = {swipe[5].xCoord, swipe[5].yCoord};
-            double invTimeStep1 = 1/((swipe[1].eventTime - swipe[0].eventTime)*.001);
-            double invTimeStep2 = 1/((swipe[2].eventTime - swipe[1].eventTime)*.001);
-            double invTimeStep3 = 1/((swipe[3].eventTime - swipe[2].eventTime)*.001);
-            double invTimeStep4 = 1/((swipe[4].eventTime - swipe[3].eventTime)*.001);
-            double invTimeStep5 = 1/((swipe[5].eventTime - swipe[4].eventTime)*.001);
+            double invTimeStep1 = 1f/(swipe[1].eventTime - swipe[0].eventTime);
+            double invTimeStep2 = 1f/(swipe[2].eventTime - swipe[1].eventTime);
+            double invTimeStep3 = 1f/(swipe[3].eventTime - swipe[2].eventTime);
+            double invTimeStep4 = 1f/(swipe[4].eventTime - swipe[3].eventTime);
+            double invTimeStep5 = 1f/(swipe[5].eventTime - swipe[4].eventTime);
             float accel1 = (float)(magVec(subVec(pos1, pos0))*invTimeStep1*invTimeStep1);
             float accel2 = (float)(magVec(subVec(pos2, pos1))*invTimeStep2*invTimeStep2);
             float accel3 = (float)(magVec(subVec(pos3, pos2))*invTimeStep3*invTimeStep3);
@@ -227,9 +227,9 @@ public class AnalyticDataFeatureSet implements java.io.Serializable , Parcelable
             float[] posSecondToLast =   {swipe[secToLasInd].xCoord, swipe[secToLasInd].yCoord};
             float[] posThirdToLast  =   {swipe[thrToLasInd].xCoord, swipe[thrToLasInd].yCoord};
             float[] posFourthToLast =   {swipe[fourToLasInd].xCoord, swipe[fourToLasInd].yCoord};
-            double invTimeStepLast = 1/((swipe[lastInd].eventTime - swipe[secToLasInd].eventTime)*.001);
-            double invTimeStep2ToLast = 1/((swipe[secToLasInd].eventTime - swipe[thrToLasInd].eventTime)*.001);
-            double invTimeStep3ToLast = 1/((swipe[thrToLasInd].eventTime - swipe[fourToLasInd].eventTime)*.001);
+            double invTimeStepLast = 1f/(swipe[lastInd].eventTime - swipe[secToLasInd].eventTime);
+            double invTimeStep2ToLast = 1f/(swipe[secToLasInd].eventTime - swipe[thrToLasInd].eventTime);
+            double invTimeStep3ToLast = 1f/(swipe[thrToLasInd].eventTime - swipe[fourToLasInd].eventTime);
             float lastVel = (float)(magVec(subVec(posLast, posSecondToLast))*invTimeStepLast);
             float secToLastVel = (float)(magVec(subVec(posSecondToLast, posThirdToLast))*invTimeStep2ToLast);
             float thrToLastVel = (float)(magVec(subVec(posThirdToLast, posFourthToLast))*invTimeStep3ToLast);
@@ -263,7 +263,7 @@ public class AnalyticDataFeatureSet implements java.io.Serializable , Parcelable
                 long currTime = currData.eventTime;
                 long lastTime = prevData.eventTime;
                 if (currTime != lastTime) {
-                    double invTimeStep = 1 / ((currTime - lastTime) * .001);
+                    double invTimeStep = 1f/(currTime - lastTime);
                     float currVel = (float) (magDisp * invTimeStep);
                     avgVel += currVel * invArrSize;
                 }

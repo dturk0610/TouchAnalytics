@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,10 +21,12 @@ public class CalibrateUser extends AppCompatActivity {
         setContentView(R.layout.confirm_registration);
         Button yesBtn = findViewById(R.id.yes_confirmRegistration);
         Button noBtn = findViewById(R.id.no_confirmRegistration);
+        EditText usrNameEditTxt = findViewById(R.id.userEditTxt);
 
         yesBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 boolean worked = OpenSaveCSV.WriteToCSV(view.getContext(), fullCollect); //------ if clicked yes on calibration page, run this
                 if (worked){
                     Intent backToMain = new Intent(view.getContext(), MainActivity.class);

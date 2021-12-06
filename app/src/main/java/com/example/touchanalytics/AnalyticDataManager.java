@@ -6,6 +6,7 @@ import android.os.Parcelable;
 import android.renderscript.ScriptGroup;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -387,7 +388,7 @@ public class AnalyticDataManager implements Parcelable {
         }
     }
 
-    public boolean compareAgainstCurrent(AnalyticDataEntry[] testSwipe){
+    public boolean compareAgainstCurrent(AnalyticDataEntry[] testSwipe, Context context){
         try {
             if (CSVParserThread != null)
                 CSVParserThread.join();
@@ -466,6 +467,17 @@ public class AnalyticDataManager implements Parcelable {
             Log.d("", "SmallestDistTestFeature: " + smallest);
             if (smallest < maxDistanceFromAverage){
                 Log.d("", "User Should be the same");
+                String toastText = "Determined to be same USR!";
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(context, toastText, duration);
+                toast.show();
+            }
+            else{
+                Log.d("", "User is not the same");
+                String toastText = "Intruder detected!";
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(context, toastText, duration);
+                toast.show();
             }
 
 

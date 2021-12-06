@@ -89,7 +89,7 @@ public class TestSwipe  extends AppCompatActivity {
                     swipe.toArray(swipeArr);
                     AnalyticDataFeatureSet feature = new AnalyticDataFeatureSet(swipeArr);
                     Log.d("", "feature:" + feature.toDebugString());
-                    dataManager.compareAgainstCurrent(swipeArr);
+                    dataManager.compareAgainstCurrent(swipeArr, this);
                     if (numOfSwipes >= requiredSwipeLimit) {
 
                     }

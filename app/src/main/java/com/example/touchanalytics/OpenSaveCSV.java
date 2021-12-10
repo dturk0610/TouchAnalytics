@@ -74,7 +74,7 @@ public class OpenSaveCSV extends AppCompatActivity {
         }
     }
 
-    public static boolean WriteToCSV(Context context, ConcurrentLinkedQueue<AnalyticDataEntry> collectionOfSwipes){
+    public static boolean WriteToCSV(Context context, ConcurrentLinkedQueue<AnalyticDataEntry> collectionOfSwipes, String userID){
         Log.d("", "Attempting to save swipe collect");
         File DCIMDir = context.getExternalFilesDir(Environment.DIRECTORY_DCIM);
         File dataDCIMDir = new File(DCIMDir, "data");
@@ -93,17 +93,44 @@ public class OpenSaveCSV extends AppCompatActivity {
             Log.d("", "other uh oh");
         }
         Log.d("", "count: " + count);
-        String userFileName = "user" + count + ".csv";
+        String userFileName = userID + ".csv";
         File newUserFile = new  File(dataDCIMDir, userFileName);
         AnalyticDataEntry dataEntry;
 
         try (FileOutputStream fOS = new FileOutputStream(newUserFile.toString())){
             while ((dataEntry = collectionOfSwipes.poll()) != null){
-                dataEntry.userId = "" + count;
+                dataEntry.userId = userID;
                 String line = dataEntry + "\n";
                 fOS.write(line.getBytes());
             }
             return true;
         }catch (Exception e){ e.printStackTrace();  return false; }
     }
+
+    public static boolean DoesFileAlreadyExistInDCIM(String fileName, Context context){
+        File DCIMDir = context.getExternalFilesDir(Environment.DIRECTORY_DCIM);
+        File dataDCIMDir = new File(DCIMDir, "data");
+        if (!dataDCIMDir.exists()){
+            return false;
+        }
+
+        File[] filesDCIM = dataDCIMDir.listFiles();
+        int count = (filesDCIM != null) ? filesDCIM.length : -1;
+        if (count == -1){
+            Log.d("", "other uh oh");
+            return false;
+        }else{
+            for (File file : filesDCIM){
+                String currFileName = file.getName();
+                String currFileNameWOutEXT = currFileName.substring(0, currFileName.indexOf('.'));
+                Log.d("", "currFileName: " + currFileNameWOutEXT);
+                Log.d("", "nameToSave: " + fileName);
+                if (currFileNameWOutEXT.equals(fileName)){
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
 }

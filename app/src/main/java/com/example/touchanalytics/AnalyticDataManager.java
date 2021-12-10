@@ -388,7 +388,7 @@ public class AnalyticDataManager implements Parcelable {
         }
     }
 
-    public boolean compareAgainstCurrent(AnalyticDataEntry[] testSwipe, Context context){
+    public boolean compareAgainstCurrent(AnalyticDataEntry[] testSwipe){
         try {
             if (CSVParserThread != null)
                 CSVParserThread.join();
@@ -467,17 +467,11 @@ public class AnalyticDataManager implements Parcelable {
             Log.d("", "SmallestDistTestFeature: " + smallest);
             if (smallest < maxDistanceFromAverage){
                 Log.d("", "User Should be the same");
-                String toastText = "Determined to be same USR!";
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(context, toastText, duration);
-                toast.show();
+                return true;
             }
             else{
                 Log.d("", "User is not the same");
-                String toastText = "Intruder detected!";
-                int duration = Toast.LENGTH_SHORT;
-                Toast toast = Toast.makeText(context, toastText, duration);
-                toast.show();
+                return false;
             }
 
 
@@ -494,7 +488,6 @@ public class AnalyticDataManager implements Parcelable {
             Log.d("", "med dist from usr med: " + (currUserMedDist - medDist));
 
              */
-            return true;
         }catch(Exception e){
             e.printStackTrace();
             return false;

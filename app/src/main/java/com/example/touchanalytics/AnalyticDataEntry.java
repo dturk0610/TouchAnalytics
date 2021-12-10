@@ -99,7 +99,7 @@ public class AnalyticDataEntry implements java.io.Serializable {
         ret += xCoord + ",";
         ret += yCoord + ",";
         ret += pressure + ",";
-        ret += size;
+        ret += size + "";
         return ret;
     }
 }

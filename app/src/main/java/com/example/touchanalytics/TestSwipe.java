@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,7 +24,10 @@ public class TestSwipe  extends AppCompatActivity {
     ConcurrentLinkedQueue<AnalyticDataEntry> swipe;
     ConcurrentLinkedQueue<AnalyticDataEntry> fullCollect;
     int numOfSwipes = 0;
-    public int requiredSwipeLimit = 20;
+    public int requiredSwipeLimit = 13;
+    float percentCanFail = .5f;
+    int numFail = 0;
+
 
     ImageView imageView;
     TextView txtView;
@@ -43,7 +47,8 @@ public class TestSwipe  extends AppCompatActivity {
         imageView.setImageDrawable(ImageSelect.RandomImage(this));
 
 
-        txtView = findViewById(R.id.swipe_amount); txtView.setText("");
+        txtView = findViewById(R.id.swipe_amount);
+        txtView.setText(String.format("%d/%d", 0, requiredSwipeLimit));
 
 
         Button backBtn = findViewById(R.id.cancelCaliBtn);
@@ -85,13 +90,35 @@ public class TestSwipe  extends AppCompatActivity {
                     swipe.add(upData);
                     fullCollect.add(upData);
                     numOfSwipes += 1;
+                    txtView.setText(String.format("%d/%d", numOfSwipes, requiredSwipeLimit));
                     AnalyticDataEntry[] swipeArr = new AnalyticDataEntry[swipe.size()];
                     swipe.toArray(swipeArr);
                     AnalyticDataFeatureSet feature = new AnalyticDataFeatureSet(swipeArr);
                     Log.d("", "feature:" + feature.toDebugString());
-                    dataManager.compareAgainstCurrent(swipeArr, this);
-                    if (numOfSwipes >= requiredSwipeLimit) {
+                    boolean didPass = dataManager.compareAgainstCurrent(swipeArr);
+                    if (!didPass)
+                        numFail ++;
+                    if (numFail >= requiredSwipeLimit*percentCanFail){
+                        String toastText = "Intruder detected!";
+                        int duration = Toast.LENGTH_SHORT;
+                        Toast toast = Toast.makeText(this, toastText, duration);
+                        toast.show();
 
+                        fullCollect.clear();
+                        swipe.clear();
+                        Intent backToMain = new Intent(this, MainActivity.class);
+                        startActivity(backToMain);
+                    } else if (numOfSwipes >= requiredSwipeLimit) {
+
+                        String toastText = "Determined to be same USR!";
+                        int duration = Toast.LENGTH_SHORT;
+                        Toast toast = Toast.makeText(this, toastText, duration);
+                        toast.show();
+
+                        numOfSwipes = 0;
+                        numFail = 0;
+                        fullCollect.clear();
+                        fullCollect = new ConcurrentLinkedQueue<AnalyticDataEntry>();
                     }
                     imageView.setImageDrawable(ImageSelect.RandomImage(this));
                 }
